@@ -1,0 +1,164 @@
+   0.622061200s  INFO prepare_target{force=false package_id=station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri) target="station_lib"}: cargo::core::compiler::fingerprint: fingerprint error for station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri)/Check { test: false }/TargetInner { ..: lib_target("station_lib", ["lib", "cdylib", "staticlib"], "C:\\Users\\elyss\\Downloads\\station\\src-tauri\\src\\lib.rs", Edition2021) }
+   0.622119400s  INFO prepare_target{force=false package_id=station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri) target="station_lib"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\elyss\Downloads\station\src-tauri\target\debug\.fingerprint\station-b83a62cdc0039ee7\lib-station_lib`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.680492900s  INFO prepare_target{force=false package_id=station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri) target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri)/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\elyss\\Downloads\\station\\src-tauri\\build.rs", Edition2021) }
+   0.680519600s  INFO prepare_target{force=false package_id=station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri) target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\elyss\Downloads\station\src-tauri\target\debug\.fingerprint\station-c0230a9fa1e8d59e\run-build-script-build-script-build`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_filter_source_repo
+  12: git_filter_source_repo
+  13: git_libgit2_prerelease
+  14: <unknown>
+  15: <unknown>
+  16: <unknown>
+  17: <unknown>
+  18: git_midx_writer_dump
+  19: git_filter_source_repo
+  20: git_midx_writer_dump
+  21: BaseThreadInitThunk
+  22: RtlUserThreadStart
+   0.787541100s  INFO prepare_target{force=false package_id=station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri) target="station_lib"}: cargo::core::compiler::fingerprint: fingerprint error for station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri)/Check { test: true }/TargetInner { ..: lib_target("station_lib", ["lib", "cdylib", "staticlib"], "C:\\Users\\elyss\\Downloads\\station\\src-tauri\\src\\lib.rs", Edition2021) }
+   0.787573400s  INFO prepare_target{force=false package_id=station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri) target="station_lib"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\elyss\Downloads\station\src-tauri\target\debug\.fingerprint\station-b26d6b8bf309285a\test-lib-station_lib`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.791118800s  INFO prepare_target{force=false package_id=station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri) target="station"}: cargo::core::compiler::fingerprint: fingerprint error for station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri)/Check { test: false }/TargetInner { name: "station", doc: true, ..: with_path("C:\\Users\\elyss\\Downloads\\station\\src-tauri\\src\\main.rs", Edition2021) }
+   0.791147600s  INFO prepare_target{force=false package_id=station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri) target="station"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\elyss\Downloads\station\src-tauri\target\debug\.fingerprint\station-36dc86ef84ae0d59\bin-station`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.793487300s  INFO prepare_target{force=false package_id=station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri) target="station"}: cargo::core::compiler::fingerprint: fingerprint error for station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri)/Check { test: true }/TargetInner { name: "station", doc: true, ..: with_path("C:\\Users\\elyss\\Downloads\\station\\src-tauri\\src\\main.rs", Edition2021) }
+   0.793544300s  INFO prepare_target{force=false package_id=station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri) target="station"}: cargo::core::compiler::fingerprint:     err: failed to read `C:\Users\elyss\Downloads\station\src-tauri\target\debug\.fingerprint\station-de6e14dba0cb88d3\test-bin-station`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   Compiling station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri)
+error: failed to run custom build command for `station v0.1.0 (C:\Users\elyss\Downloads\station\src-tauri)`
+note: To improve backtraces for build dependencies, set the CARGO_PROFILE_DEV_BUILD_OVERRIDE_DEBUG=true environment variable to enable debug information generation.
+
+Caused by:
+  process didn't exit successfully: `C:\Users\elyss\Downloads\station\src-tauri\target\debug\build\station-5686248502407e4f\build-script-build` (exit code: 1)
+  --- stdout
+  cargo:rerun-if-env-changed=TAURI_CONFIG
+  cargo:rustc-check-cfg=cfg(desktop)
+  cargo:rustc-cfg=desktop
+  cargo:rustc-check-cfg=cfg(mobile)
+  cargo:rerun-if-changed=C:\Users\elyss\Downloads\station\src-tauri\tauri.conf.json
+  cargo:rustc-env=TAURI_ANDROID_PACKAGE_NAME_APP_NAME=app
+  cargo:rustc-env=TAURI_ANDROID_PACKAGE_NAME_PREFIX=com_station
+  cargo:rustc-check-cfg=cfg(dev)
+  cargo:rustc-cfg=dev
+  cargo:PERMISSION_FILES_PATH=C:\Users\elyss\Downloads\station\src-tauri\target\debug\build\station-c0230a9fa1e8d59e\out\app-manifest\__app__-permission-files
+  cargo:rerun-if-changed=capabilities
+  cargo:rerun-if-env-changed=REMOVE_UNUSED_COMMANDS
+  cargo:rustc-env=TAURI_ENV_TARGET_TRIPLE=x86_64-pc-windows-msvc
+  package.metadata does not exist
+  `icons/icon.ico` not found; required for generating a Windows Resource file during tauri-build

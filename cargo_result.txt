@@ -1,0 +1,122 @@
+﻿cargo :    Compiling proc-macro2 v1.0.106
+At C:\Users\elyss\Downloads\station\build_check.ps1:4 char:1
++ cargo check 2>&1 | Out-File -FilePath "C:\Users\elyss\Downloads\stati ...
++ ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling proc-macro2 v1.0.106:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   Compiling quote v1.0.44
+   Compiling serde_core v1.0.228
+   Compiling zerocopy v0.8.39
+   Compiling parking_lot_core v0.9.12
+    Checking windows-link v0.2.1
+   Compiling icu_normalizer_data v2.1.1
+error: linking with `link.exe` failed: exit code: 1181
+  |
+  = note: "C:\\Program Files\\Microsoft Visual 
+Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe" "/NOLOGO" 
+"C:\\Users\\elyss\\AppData\\Local\\Temp\\rustcYk9C9c\\symbols.o" "<2 object files omitted>" "<sysroot>\\lib\\rustlib\\x
+86_64-pc-windows-msvc\\lib/{libstd-*,libpanic_unwind-*,libcfg_if-*,libwindows_targets-*,librustc_demangle-*,libstd_dete
+ct-*,libhashbrown-*,librustc_std_workspace_alloc-*,libunwind-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libco
+mpiler_builtins-*}.rlib" "kernel32.lib" "kernel32.lib" "kernel32.lib" "ntdll.lib" "userenv.lib" "ws2_32.lib" 
+"dbghelp.lib" "/defaultlib:msvcrt" "/NXCOMPAT" "/OUT:C:\\Users\\elyss\\Downloads\\station\\src-tauri\\target\\debug\\bu
+ild\\parking_lot_core-07bed3c3d0306f1f\\build_script_build-07bed3c3d0306f1f.exe" "/OPT:REF,NOICF" "/DEBUG" 
+"/PDBALTPATH:%_PDB%" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\intrinsic.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\liballoc.natvis" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libcore.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libstd.natvis"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: LINK : fatal error LNK1181: cannot open input file 'kernel32.lib'ÔÉì
+          
+
+error: linking with `link.exe` failed: exit code: 1181
+  |
+  = note: "C:\\Program Files\\Microsoft Visual 
+Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe" "/NOLOGO" 
+"C:\\Users\\elyss\\AppData\\Local\\Temp\\rustcKzpg5y\\symbols.o" "<2 object files omitted>" "<sysroot>\\lib\\rustlib\\x
+86_64-pc-windows-msvc\\lib/{libstd-*,libpanic_unwind-*,libcfg_if-*,libwindows_targets-*,librustc_demangle-*,libstd_dete
+ct-*,libhashbrown-*,librustc_std_workspace_alloc-*,libunwind-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libco
+mpiler_builtins-*}.rlib" "kernel32.lib" "kernel32.lib" "kernel32.lib" "ntdll.lib" "userenv.lib" "ws2_32.lib" 
+"dbghelp.lib" "/defaultlib:msvcrt" "/NXCOMPAT" "/OUT:C:\\Users\\elyss\\Downloads\\station\\src-tauri\\target\\debug\\bu
+ild\\quote-c7f8f84baf71e25f\\build_script_build-c7f8f84baf71e25f.exe" "/OPT:REF,NOICF" "/DEBUG" "/PDBALTPATH:%_PDB%" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\intrinsic.natvis" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\liballoc.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libcore.natvis" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libstd.natvis"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: LINK : fatal error LNK1181: cannot open input file 'kernel32.lib'ÔÉì
+          
+
+error: linking with `link.exe` failed: exit code: 1181
+  |
+  = note: "C:\\Program Files\\Microsoft Visual 
+Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe" "/NOLOGO" 
+"C:\\Users\\elyss\\AppData\\Local\\Temp\\rustcMMMTH2\\symbols.o" "<3 object files omitted>" "<sysroot>\\lib\\rustlib\\x
+86_64-pc-windows-msvc\\lib/{libstd-*,libpanic_unwind-*,libcfg_if-*,libwindows_targets-*,librustc_demangle-*,libstd_dete
+ct-*,libhashbrown-*,librustc_std_workspace_alloc-*,libunwind-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libco
+mpiler_builtins-*}.rlib" "kernel32.lib" "kernel32.lib" "kernel32.lib" "ntdll.lib" "userenv.lib" "ws2_32.lib" 
+"dbghelp.lib" "/defaultlib:msvcrt" "/NXCOMPAT" "/OUT:C:\\Users\\elyss\\Downloads\\station\\src-tauri\\target\\debug\\bu
+ild\\proc-macro2-e34c4cfc9b9add7c\\build_script_build-e34c4cfc9b9add7c.exe" "/OPT:REF,NOICF" "/DEBUG" 
+"/PDBALTPATH:%_PDB%" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\intrinsic.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\liballoc.natvis" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libcore.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libstd.natvis"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: LINK : fatal error LNK1181: cannot open input file 'kernel32.lib'ÔÉì
+          
+
+error: linking with `link.exe` failed: exit code: 1181
+  |
+  = note: "C:\\Program Files\\Microsoft Visual 
+Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe" "/NOLOGO" 
+"C:\\Users\\elyss\\AppData\\Local\\Temp\\rustcBAuZdS\\symbols.o" "<2 object files omitted>" "<sysroot>\\lib\\rustlib\\x
+86_64-pc-windows-msvc\\lib/{libstd-*,libpanic_unwind-*,libcfg_if-*,libwindows_targets-*,librustc_demangle-*,libstd_dete
+ct-*,libhashbrown-*,librustc_std_workspace_alloc-*,libunwind-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libco
+mpiler_builtins-*}.rlib" "kernel32.lib" "kernel32.lib" "kernel32.lib" "ntdll.lib" "userenv.lib" "ws2_32.lib" 
+"dbghelp.lib" "/defaultlib:msvcrt" "/NXCOMPAT" "/OUT:C:\\Users\\elyss\\Downloads\\station\\src-tauri\\target\\debug\\bu
+ild\\icu_normalizer_data-1103ca9ba065819a\\build_script_build-1103ca9ba065819a.exe" "/OPT:REF,NOICF" "/DEBUG" 
+"/PDBALTPATH:%_PDB%" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\intrinsic.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\liballoc.natvis" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libcore.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libstd.natvis"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: LINK : fatal error LNK1181: cannot open input file 'kernel32.lib'ÔÉì
+          
+
+error: linking with `link.exe` failed: exit code: 1181
+  |
+  = note: "C:\\Program Files\\Microsoft Visual 
+Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe" "/NOLOGO" 
+"C:\\Users\\elyss\\AppData\\Local\\Temp\\rustcXmMt3l\\symbols.o" "<3 object files omitted>" "<sysroot>\\lib\\rustlib\\x
+86_64-pc-windows-msvc\\lib/{libstd-*,libpanic_unwind-*,libcfg_if-*,libwindows_targets-*,librustc_demangle-*,libstd_dete
+ct-*,libhashbrown-*,librustc_std_workspace_alloc-*,libunwind-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libco
+mpiler_builtins-*}.rlib" "kernel32.lib" "kernel32.lib" "kernel32.lib" "ntdll.lib" "userenv.lib" "ws2_32.lib" 
+"dbghelp.lib" "/defaultlib:msvcrt" "/NXCOMPAT" "/OUT:C:\\Users\\elyss\\Downloads\\station\\src-tauri\\target\\debug\\bu
+ild\\serde_core-29566b51c2fc4885\\build_script_build-29566b51c2fc4885.exe" "/OPT:REF,NOICF" "/DEBUG" 
+"/PDBALTPATH:%_PDB%" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\intrinsic.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\liballoc.natvis" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libcore.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libstd.natvis"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: LINK : fatal error LNK1181: cannot open input file 'kernel32.lib'ÔÉì
+          
+
+error: linking with `link.exe` failed: exit code: 1181
+  |
+  = note: "C:\\Program Files\\Microsoft Visual 
+Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe" "/NOLOGO" 
+"C:\\Users\\elyss\\AppData\\Local\\Temp\\rustctV3K8L\\symbols.o" "<6 object files omitted>" "<sysroot>\\lib\\rustlib\\x
+86_64-pc-windows-msvc\\lib/{libstd-*,libpanic_unwind-*,libcfg_if-*,libwindows_targets-*,librustc_demangle-*,libstd_dete
+ct-*,libhashbrown-*,librustc_std_workspace_alloc-*,libunwind-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libco
+mpiler_builtins-*}.rlib" "kernel32.lib" "kernel32.lib" "kernel32.lib" "ntdll.lib" "userenv.lib" "ws2_32.lib" 
+"dbghelp.lib" "/defaultlib:msvcrt" "/NXCOMPAT" "/OUT:C:\\Users\\elyss\\Downloads\\station\\src-tauri\\target\\debug\\bu
+ild\\zerocopy-cc7fb013ad0772e1\\build_script_build-cc7fb013ad0772e1.exe" "/OPT:REF,NOICF" "/DEBUG" 
+"/PDBALTPATH:%_PDB%" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\intrinsic.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\liballoc.natvis" "/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libcore.natvis" 
+"/NATVIS:<sysroot>\\lib\\rustlib\\etc\\libstd.natvis"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: LINK : fatal error LNK1181: cannot open input file 'kernel32.lib'ÔÉì
+          
+
+error: could not compile `zerocopy` (build script) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `serde_core` (build script) due to 1 previous error
+error: could not compile `proc-macro2` (build script) due to 1 previous error
+error: could not compile `parking_lot_core` (build script) due to 1 previous error
+error: could not compile `quote` (build script) due to 1 previous error
+error: could not compile `icu_normalizer_data` (build script) due to 1 previous error
+EXIT_CODE: 101

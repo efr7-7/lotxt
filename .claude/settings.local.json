@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "WebFetch(domain:zed.dev)",
+      "Bash(rustc:*)",
+      "Bash(cargo --version:*)",
+      "Bash(node:*)",
+      "Bash(npm --version:*)",
+      "Bash(where:*)",
+      "Bash(export PATH=\"$HOME/.cargo/bin:$PATH:/c/Users/elyss/.cargo/bin:/c/Program Files/nodejs:/c/Program Files/Rust/bin\")",
+      "Bash(export PATH=\"$HOME/.cargo/bin:$PATH:/c/Program Files/nodejs\")",
+      "Bash(npm install:*)",
+      "Bash(npx vite:*)",
+      "Bash(cargo check:*)",
+      "Bash(cmd //c \"\"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\VC\\\\Auxiliary\\\\Build\\\\vcvars64.bat\"\" && cd C:\\\\Users\\\\elyss\\\\Downloads\\\\station\\\\src-tauri && cargo check\")",
+      "Bash(cmd //c \"\"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\VC\\\\Auxiliary\\\\Build\\\\vcvars64.bat\"\" >nul 2>&1 && cd C:\\\\Users\\\\elyss\\\\Downloads\\\\station\\\\src-tauri && cargo check 2>&1\")",
+      "Bash(cmd.exe /c \"call \\\\\"C:\\\\\\\\Program Files\\\\\\\\Microsoft Visual Studio\\\\\\\\2022\\\\\\\\Community\\\\\\\\VC\\\\\\\\Auxiliary\\\\\\\\Build\\\\\\\\vcvars64.bat\\\\\" && cd /d C:\\\\\\\\Users\\\\\\\\elyss\\\\\\\\Downloads\\\\\\\\station\\\\\\\\src-tauri && cargo check\":*)",
+      "Bash(cmd.exe /c \"call \"\"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\VC\\\\Auxiliary\\\\Build\\\\vcvars64.bat\"\" >nul 2>&1 && set PATH=%USERPROFILE%\\\\.cargo\\\\bin;%PATH% && cd /d C:\\\\Users\\\\elyss\\\\Downloads\\\\station\\\\src-tauri && cargo check 2>&1\")",
+      "Bash(/c/Users/elyss/Downloads/station/build.bat << 'BATEOF'\n@echo off\ncall \"C:\\\\Program Files\\\\Microsoft Visual Studio\\\\2022\\\\Community\\\\VC\\\\Auxiliary\\\\Build\\\\vcvars64.bat\" >nul 2>&1\nset PATH=%USERPROFILE%\\\\.cargo\\\\bin;%PATH%\ncd /d C:\\\\Users\\\\elyss\\\\Downloads\\\\station\\\\src-tauri\ncargo check 2>&1\necho EXIT_CODE=%ERRORLEVEL%\nBATEOF)",
+      "Bash(cmd.exe /c \"C:\\\\Users\\\\elyss\\\\Downloads\\\\station\\\\build.bat\")",
+      "Bash(cmd.exe /c \"C:\\\\Users\\\\elyss\\\\Downloads\\\\station\\\\build_check.bat\")",
+      "Bash(test:*)",
+      "Bash(ls:*)",
+      "Bash(cmd.exe /c \"C:\\\\Users\\\\elyss\\\\Downloads\\\\station\\\\build_check2.bat\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(export PATH=\"$HOME/.cargo/bin:$PATH\")",
+      "Bash(rustup target list:*)",
+      "Bash(rustup toolchain:*)",
+      "Bash(rustup target add:*)",
+      "Bash(rustup default:*)"
+    ]
+  }
+}

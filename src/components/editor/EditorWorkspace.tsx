@@ -169,34 +169,43 @@ export default function EditorWorkspace() {
             <div className="flex items-center gap-2 px-4 py-1.5 bg-muted/30 border-b border-border/20">
               <span className="text-[10px] text-muted-foreground/40 font-medium mr-1">Tips:</span>
               {hintsState.publish && (
-                <button
-                  onClick={() => dismissHint("publish")}
-                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/8 border border-primary/15 text-[10.5px] text-foreground/70 hover:bg-primary/12 transition-colors group"
-                >
-                  <Send className="w-3 h-3 text-primary" />
-                  <span>Publish to Beehiiv, Substack, or Ghost</span>
-                  <X className="w-2.5 h-2.5 text-muted-foreground/40 group-hover:text-foreground/60" />
-                </button>
+                <div className="flex items-center gap-1 rounded-full bg-primary/8 border border-primary/15 text-[10.5px] text-foreground/70 hover:bg-primary/12 transition-colors group pl-2 pr-0.5 py-0.5">
+                  <Send className="w-3 h-3 text-primary shrink-0" />
+                  <span className="cursor-default">Publish to Beehiiv, Substack, or Ghost</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); dismissHint("publish"); }}
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-muted-foreground/40 hover:text-foreground/80 hover:bg-muted/60 transition-colors ml-0.5"
+                    title="Dismiss tip"
+                  >
+                    <X className="w-2.5 h-2.5" />
+                  </button>
+                </div>
               )}
               {hintsState.ai && (
-                <button
-                  onClick={() => dismissHint("ai")}
-                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/8 border border-primary/15 text-[10.5px] text-foreground/70 hover:bg-primary/12 transition-colors group"
-                >
-                  <Sparkles className="w-3 h-3 text-primary" />
-                  <span>AI writing assistant — Ctrl+J</span>
-                  <X className="w-2.5 h-2.5 text-muted-foreground/40 group-hover:text-foreground/60" />
-                </button>
+                <div className="flex items-center gap-1 rounded-full bg-primary/8 border border-primary/15 text-[10.5px] text-foreground/70 hover:bg-primary/12 transition-colors group pl-2 pr-0.5 py-0.5">
+                  <Sparkles className="w-3 h-3 text-primary shrink-0" />
+                  <button onClick={toggleAi} className="hover:text-primary transition-colors">AI writing assistant — Ctrl+J</button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); dismissHint("ai"); }}
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-muted-foreground/40 hover:text-foreground/80 hover:bg-muted/60 transition-colors ml-0.5"
+                    title="Dismiss tip"
+                  >
+                    <X className="w-2.5 h-2.5" />
+                  </button>
+                </div>
               )}
               {hintsState.insights && (
-                <button
-                  onClick={() => dismissHint("insights")}
-                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/8 border border-primary/15 text-[10.5px] text-foreground/70 hover:bg-primary/12 transition-colors group"
-                >
-                  <BarChart3 className="w-3 h-3 text-primary" />
-                  <span>Live readability scores in Insights tab →</span>
-                  <X className="w-2.5 h-2.5 text-muted-foreground/40 group-hover:text-foreground/60" />
-                </button>
+                <div className="flex items-center gap-1 rounded-full bg-primary/8 border border-primary/15 text-[10.5px] text-foreground/70 hover:bg-primary/12 transition-colors group pl-2 pr-0.5 py-0.5">
+                  <BarChart3 className="w-3 h-3 text-primary shrink-0" />
+                  <span className="cursor-default">Live readability scores in Insights tab</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); dismissHint("insights"); }}
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-muted-foreground/40 hover:text-foreground/80 hover:bg-muted/60 transition-colors ml-0.5"
+                    title="Dismiss tip"
+                  >
+                    <X className="w-2.5 h-2.5" />
+                  </button>
+                </div>
               )}
             </div>
           )}

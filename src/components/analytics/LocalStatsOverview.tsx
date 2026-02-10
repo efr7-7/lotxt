@@ -147,23 +147,45 @@ function WritingInsights({ week }: { week: DayActivity[] }) {
 
 // ── Main Component ──
 
+function daysAgo(n: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return d.toISOString().slice(0, 10);
+}
+
 export function LocalStatsOverview() {
-  const streakState = useStreakStore();
-  const week = useStreakStore((s) => s.getWeek());
-  const today = useStreakStore((s) => s.getToday());
+  const streakDays = useStreakStore((s) => s.days);
+  const currentStreak = useStreakStore((s) => s.currentStreak);
+  const totalFocusMinutesAllTime = useStreakStore((s) => s.totalFocusMinutesAllTime);
   const documents = useEditorStore((s) => s.documents);
   const currentDoc = useEditorStore((s) => s.currentDocument);
 
   const totalDocs = documents.length + 1; // +1 for currentDocument
 
+  // Derive week data from days array (avoids infinite re-render from getWeek())
+  const week = useMemo(() => {
+    const weekDates = Array.from({ length: 7 }, (_, i) => daysAgo(6 - i));
+    return weekDates.map(
+      (date) =>
+        streakDays.find((d) => d.date === date) ?? {
+          date,
+          wordsWritten: 0,
+          documentsEdited: 0,
+          focusMinutes: 0,
+          designsCreated: 0,
+          postsPublished: 0,
+        },
+    );
+  }, [streakDays]);
+
   // Format focus minutes
   const focusFormatted = useMemo(() => {
-    const total = streakState.totalFocusMinutesAllTime;
+    const total = totalFocusMinutesAllTime;
     if (total < 60) return `${total}m`;
     const h = Math.floor(total / 60);
     const m = total % 60;
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
-  }, [streakState.totalFocusMinutesAllTime]);
+  }, [totalFocusMinutesAllTime]);
 
   // Words this week
   const wordsThisWeek = useMemo(
@@ -190,7 +212,7 @@ export function LocalStatsOverview() {
       const d = new Date();
       d.setDate(d.getDate() - (90 - i));
       const dateStr = d.toISOString().slice(0, 10);
-      const activity = streakState.days.find(
+      const activity = streakDays.find(
         (day) => day.date === dateStr,
       );
       return {
@@ -199,7 +221,7 @@ export function LocalStatsOverview() {
         isToday: dateStr === todayStr,
       };
     });
-  }, [streakState.days]);
+  }, [streakDays]);
 
   return (
     <div className="max-w-5xl mx-auto px-8 py-6 flex flex-col">
@@ -229,7 +251,7 @@ export function LocalStatsOverview() {
         <MetricCard
           icon={Flame}
           iconColor="bg-orange-400/10 text-orange-400"
-          value={`${streakState.currentStreak} days`}
+          value={`${currentStreak} days`}
           label="Current streak"
           delay={40}
         />

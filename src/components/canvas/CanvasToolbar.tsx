@@ -34,11 +34,12 @@ import {
   AlignVerticalJustifyEnd,
   AlignHorizontalSpaceAround,
   AlignVerticalSpaceAround,
+  Maximize,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CanvasTool, CanvasElement } from "@/types/canvas";
 
-const SHAPE_TOOLS: { id: CanvasTool; icon: typeof MousePointer2; label: string }[] = [
+const CREATE_TOOLS: { id: CanvasTool; icon: typeof MousePointer2; label: string }[] = [
   { id: "select", icon: MousePointer2, label: "Select (V)" },
   { id: "rect", icon: Square, label: "Rectangle (R)" },
   { id: "circle", icon: Circle, label: "Circle (C)" },
@@ -63,6 +64,27 @@ const DISTRIBUTE_OPTIONS: { axis: DistributeAxis; icon: typeof AlignHorizontalSp
   { axis: "horizontal", icon: AlignHorizontalSpaceAround, label: "Distribute Horizontally" },
   { axis: "vertical", icon: AlignVerticalSpaceAround, label: "Distribute Vertically" },
 ];
+
+/* ---- Custom tooltip component ---- */
+function ToolTip({ children, label }: { children: React.ReactNode; label: string }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {show && (
+        <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[60] pointer-events-none">
+          <div className="px-2.5 py-1 rounded-lg bg-background/90 backdrop-blur-xl border border-border/40 shadow-lg shadow-black/20 text-[10px] font-medium text-foreground/80 whitespace-nowrap">
+            {label}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface CanvasToolbarProps {
   onToggleAi?: () => void;
@@ -96,7 +118,26 @@ export function CanvasToolbar({ onToggleAi, showAi, onSaveTemplate }: CanvasTool
   const [showAlignMenu, setShowAlignMenu] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [jpegQuality, setJpegQuality] = useState(0.92);
+  const [showFillPicker, setShowFillPicker] = useState(false);
+  const [showStrokePicker, setShowStrokePicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Quick color swatch state from selected element
+  const elements = useCanvasStore((s) => s.elements);
+  const updateElement = useCanvasStore((s) => s.updateElement);
+  const selectedElement =
+    selectedIds.length === 1
+      ? elements.find((el) => el.id === selectedIds[0])
+      : null;
+
+  const currentFill =
+    selectedElement && "fill" in selectedElement
+      ? (selectedElement as any).fill || "#6366f1"
+      : "#6366f1";
+  const currentStroke =
+    selectedElement && "stroke" in selectedElement
+      ? (selectedElement as any).stroke || "transparent"
+      : "transparent";
 
   const handleToolClick = (toolId: CanvasTool) => {
     if (toolId === "select" || toolId === "line" || toolId === "arrow") {
@@ -331,239 +372,372 @@ export function CanvasToolbar({ onToggleAi, showAi, onSaveTemplate }: CanvasTool
     setShowExportMenu(false);
   };
 
+  const handleFitToScreen = () => {
+    // Calculate zoom to fit canvas within viewport with some padding
+    const viewportW = window.innerWidth - 56 - 60 - 64; // left panel + right panel + padding
+    const viewportH = window.innerHeight - 44 - 33 - 64; // toolbar + ruler + status bar + padding
+    const scaleW = viewportW / canvasSize.width;
+    const scaleH = viewportH / canvasSize.height;
+    const fitZoom = Math.min(scaleW, scaleH, 1);
+    setZoom(Math.round(fitZoom * 100) / 100);
+  };
+
   const multipleSelected = selectedIds.length >= 2;
 
   return (
-    <div className="h-11 flex items-center px-4 border-b border-border gap-1 shrink-0 bg-background relative">
-      {/* Shape Tools */}
-      {SHAPE_TOOLS.map((t) => (
-        <button
-          key={t.id}
-          onClick={() => handleToolClick(t.id)}
-          title={t.label}
-          className={cn(
-            "h-8 w-8 rounded-md flex items-center justify-center transition-colors",
-            tool === t.id
-              ? "bg-primary/15 text-primary"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted",
-          )}
-        >
-          <t.icon className="w-4 h-4" />
-        </button>
-      ))}
-
-      {/* Image tool */}
-      <button
-        onClick={() => handleToolClick("image")}
-        title="Image (I)"
-        className={cn(
-          "h-8 w-8 rounded-md flex items-center justify-center transition-colors",
-          showImageDialog
-            ? "bg-primary/15 text-primary"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted",
-        )}
-      >
-        <ImageIcon className="w-4 h-4" />
-      </button>
-
-      <div className="w-px h-5 bg-border mx-2" />
-
-      {/* Grid toggle */}
-      <button
-        onClick={() => {
-          setShowGrid(!showGrid);
-          if (!showGrid) setSnapToGrid(true);
-        }}
-        title={showGrid ? "Hide Grid" : "Show Grid"}
-        className={cn(
-          "h-8 w-8 rounded-md flex items-center justify-center transition-colors",
-          showGrid
-            ? "bg-primary/15 text-primary"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted",
-        )}
-      >
-        <Grid3X3 className="w-4 h-4" />
-      </button>
-
-      {/* Alignment dropdown — only when 2+ selected */}
-      <div className="relative">
-        <button
-          onClick={() => setShowAlignMenu((v) => !v)}
-          disabled={!multipleSelected}
-          title="Align & Distribute"
-          className={cn(
-            "h-8 px-2 rounded-md flex items-center gap-1 text-xs font-medium transition-colors",
-            !multipleSelected
-              ? "text-muted-foreground/30 cursor-not-allowed"
-              : showAlignMenu
-                ? "bg-primary/15 text-primary"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted",
-          )}
-        >
-          <AlignHorizontalJustifyCenter className="w-3.5 h-3.5" />
-          <ChevronDown className="w-3 h-3 opacity-50" />
-        </button>
-
-        {showAlignMenu && multipleSelected && (
-          <>
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setShowAlignMenu(false)}
-            />
-            <div className="absolute left-0 top-full mt-1 w-52 rounded-xl border border-border/60 bg-background/95 backdrop-blur-xl shadow-2xl shadow-black/30 z-50 p-1.5">
-              <div className="px-2 py-1">
-                <span className="text-[9px] font-semibold text-muted-foreground/40 uppercase tracking-wider">
-                  Align
-                </span>
-              </div>
-              {ALIGN_OPTIONS.map((opt) => (
-                <button
-                  key={opt.direction}
-                  onClick={() => {
-                    alignElements(opt.direction);
-                    setShowAlignMenu(false);
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-foreground/80 hover:bg-accent/50 transition-colors"
-                >
-                  <opt.icon className="w-3.5 h-3.5 text-muted-foreground/60" />
-                  {opt.label}
-                </button>
-              ))}
-              {selectedIds.length >= 3 && (
-                <>
-                  <div className="h-px bg-border/30 my-1" />
-                  <div className="px-2 py-1">
-                    <span className="text-[9px] font-semibold text-muted-foreground/40 uppercase tracking-wider">
-                      Distribute
-                    </span>
-                  </div>
-                  {DISTRIBUTE_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.axis}
-                      onClick={() => {
-                        distributeElements(opt.axis);
-                        setShowAlignMenu(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-foreground/80 hover:bg-accent/50 transition-colors"
-                    >
-                      <opt.icon className="w-3.5 h-3.5 text-muted-foreground/60" />
-                      {opt.label}
-                    </button>
-                  ))}
-                </>
+    <div className="h-11 flex items-center px-2 border-b border-border/60 gap-0.5 shrink-0 bg-background/95 backdrop-blur-sm relative">
+      {/* ── Create section ── */}
+      <div className="flex items-center gap-0.5 relative">
+        <span className="absolute -top-0.5 left-1 text-[7px] font-semibold text-muted-foreground/25 uppercase tracking-[0.1em] select-none pointer-events-none">
+          Create
+        </span>
+        {CREATE_TOOLS.map((t) => (
+          <ToolTip key={t.id} label={t.label}>
+            <button
+              onClick={() => handleToolClick(t.id)}
+              className={cn(
+                "h-8 w-8 rounded-md flex items-center justify-center transition-all relative",
+                tool === t.id
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
               )}
-            </div>
-          </>
-        )}
+            >
+              <t.icon className="w-4 h-4" />
+              {/* Active bottom indicator */}
+              {tool === t.id && (
+                <div className="absolute -bottom-[3px] left-1/2 -translate-x-1/2 w-4 h-[2px] bg-primary rounded-full" />
+              )}
+            </button>
+          </ToolTip>
+        ))}
+
+        {/* Image tool */}
+        <ToolTip label="Image (I)">
+          <button
+            onClick={() => handleToolClick("image")}
+            className={cn(
+              "h-8 w-8 rounded-md flex items-center justify-center transition-all relative",
+              showImageDialog
+                ? "bg-primary/15 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+            )}
+          >
+            <ImageIcon className="w-4 h-4" />
+            {showImageDialog && (
+              <div className="absolute -bottom-[3px] left-1/2 -translate-x-1/2 w-4 h-[2px] bg-primary rounded-full" />
+            )}
+          </button>
+        </ToolTip>
       </div>
 
-      <div className="w-px h-5 bg-border mx-2" />
+      <div className="w-px h-5 bg-border/40 mx-1.5" />
 
-      {/* Undo/Redo */}
-      <button
-        onClick={undo}
-        title="Undo (Ctrl+Z)"
-        className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-      >
-        <Undo2 className="w-4 h-4" />
-      </button>
-      <button
-        onClick={redo}
-        title="Redo (Ctrl+Y)"
-        className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-      >
-        <Redo2 className="w-4 h-4" />
-      </button>
+      {/* ── Edit section ── */}
+      <div className="flex items-center gap-0.5 relative">
+        <span className="absolute -top-0.5 left-1 text-[7px] font-semibold text-muted-foreground/25 uppercase tracking-[0.1em] select-none pointer-events-none">
+          Edit
+        </span>
 
-      <div className="w-px h-5 bg-border mx-2" />
+        {/* Grid toggle */}
+        <ToolTip label={showGrid ? "Hide Grid" : "Show Grid"}>
+          <button
+            onClick={() => {
+              setShowGrid(!showGrid);
+              if (!showGrid) setSnapToGrid(true);
+            }}
+            className={cn(
+              "h-8 w-8 rounded-md flex items-center justify-center transition-all relative",
+              showGrid
+                ? "bg-primary/15 text-primary"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+            )}
+          >
+            <Grid3X3 className="w-4 h-4" />
+            {showGrid && (
+              <div className="absolute -bottom-[3px] left-1/2 -translate-x-1/2 w-4 h-[2px] bg-primary rounded-full" />
+            )}
+          </button>
+        </ToolTip>
 
-      {/* Zoom */}
-      <button
-        onClick={() => setZoom(zoom - 0.1)}
-        title="Zoom Out"
-        className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-      >
-        <ZoomOut className="w-4 h-4" />
-      </button>
-      <span className="text-xs text-muted-foreground w-12 text-center select-none">
-        {Math.round(zoom * 100)}%
-      </span>
-      <button
-        onClick={() => setZoom(zoom + 0.1)}
-        title="Zoom In"
-        className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-      >
-        <ZoomIn className="w-4 h-4" />
-      </button>
+        {/* Alignment dropdown -- only when 2+ selected */}
+        <div className="relative">
+          <ToolTip label="Align & Distribute">
+            <button
+              onClick={() => setShowAlignMenu((v) => !v)}
+              disabled={!multipleSelected}
+              className={cn(
+                "h-8 px-2 rounded-md flex items-center gap-1 text-xs font-medium transition-all",
+                !multipleSelected
+                  ? "text-muted-foreground/20 cursor-not-allowed"
+                  : showAlignMenu
+                    ? "bg-primary/15 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+              )}
+            >
+              <AlignHorizontalJustifyCenter className="w-3.5 h-3.5" />
+              <ChevronDown className="w-3 h-3 opacity-50" />
+            </button>
+          </ToolTip>
+
+          {showAlignMenu && multipleSelected && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowAlignMenu(false)}
+              />
+              <div className="absolute left-0 top-full mt-1 w-52 rounded-xl border border-border/60 bg-background/95 backdrop-blur-xl shadow-2xl shadow-black/30 z-50 p-1.5">
+                <div className="px-2 py-1">
+                  <span className="text-[9px] font-semibold text-muted-foreground/40 uppercase tracking-wider">
+                    Align
+                  </span>
+                </div>
+                {ALIGN_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.direction}
+                    onClick={() => {
+                      alignElements(opt.direction);
+                      setShowAlignMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-foreground/80 hover:bg-accent/50 transition-colors"
+                  >
+                    <opt.icon className="w-3.5 h-3.5 text-muted-foreground/60" />
+                    {opt.label}
+                  </button>
+                ))}
+                {selectedIds.length >= 3 && (
+                  <>
+                    <div className="h-px bg-border/30 my-1" />
+                    <div className="px-2 py-1">
+                      <span className="text-[9px] font-semibold text-muted-foreground/40 uppercase tracking-wider">
+                        Distribute
+                      </span>
+                    </div>
+                    {DISTRIBUTE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.axis}
+                        onClick={() => {
+                          distributeElements(opt.axis);
+                          setShowAlignMenu(false);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-foreground/80 hover:bg-accent/50 transition-colors"
+                      >
+                        <opt.icon className="w-3.5 h-3.5 text-muted-foreground/60" />
+                        {opt.label}
+                      </button>
+                    ))}
+                  </>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Undo/Redo */}
+        <ToolTip label="Undo (Ctrl+Z)">
+          <button
+            onClick={undo}
+            className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+          >
+            <Undo2 className="w-4 h-4" />
+          </button>
+        </ToolTip>
+        <ToolTip label="Redo (Ctrl+Y)">
+          <button
+            onClick={redo}
+            className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+          >
+            <Redo2 className="w-4 h-4" />
+          </button>
+        </ToolTip>
+      </div>
+
+      <div className="w-px h-5 bg-border/40 mx-1.5" />
+
+      {/* ── Color Swatches ── */}
+      {selectedElement && (
+        <>
+          <div className="flex items-center gap-1 relative">
+            <span className="absolute -top-0.5 left-0.5 text-[7px] font-semibold text-muted-foreground/25 uppercase tracking-[0.1em] select-none pointer-events-none">
+              Color
+            </span>
+            {/* Fill swatch */}
+            <ToolTip label="Fill Color">
+              <div className="relative">
+                <button
+                  onClick={() => { setShowFillPicker((v) => !v); setShowStrokePicker(false); }}
+                  className="h-7 w-7 rounded-md border border-border/40 flex items-center justify-center hover:border-border/80 transition-colors overflow-hidden"
+                >
+                  <div
+                    className="w-5 h-5 rounded-[3px]"
+                    style={{ backgroundColor: currentFill || "#6366f1" }}
+                  />
+                </button>
+                {showFillPicker && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowFillPicker(false)} />
+                    <div className="absolute left-0 top-full mt-1 z-50 p-2 rounded-xl border border-border/60 bg-background/95 backdrop-blur-xl shadow-2xl shadow-black/30">
+                      <label className="text-[9px] font-semibold text-muted-foreground/40 uppercase tracking-wider mb-1 block">Fill</label>
+                      <input
+                        type="color"
+                        value={currentFill}
+                        onChange={(e) => {
+                          if (selectedElement) updateElement(selectedElement.id, { fill: e.target.value });
+                        }}
+                        className="w-32 h-24 rounded border-0 cursor-pointer bg-transparent"
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </ToolTip>
+
+            {/* Stroke swatch */}
+            <ToolTip label="Stroke Color">
+              <div className="relative">
+                <button
+                  onClick={() => { setShowStrokePicker((v) => !v); setShowFillPicker(false); }}
+                  className="h-7 w-7 rounded-md border border-border/40 flex items-center justify-center hover:border-border/80 transition-colors overflow-hidden"
+                >
+                  <div
+                    className="w-5 h-5 rounded-[3px] border-2"
+                    style={{
+                      borderColor: currentStroke && currentStroke !== "transparent" ? currentStroke : "hsl(var(--muted-foreground)/0.2)",
+                      backgroundColor: "transparent",
+                    }}
+                  />
+                </button>
+                {showStrokePicker && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowStrokePicker(false)} />
+                    <div className="absolute left-0 top-full mt-1 z-50 p-2 rounded-xl border border-border/60 bg-background/95 backdrop-blur-xl shadow-2xl shadow-black/30">
+                      <label className="text-[9px] font-semibold text-muted-foreground/40 uppercase tracking-wider mb-1 block">Stroke</label>
+                      <input
+                        type="color"
+                        value={currentStroke && currentStroke !== "transparent" ? currentStroke : "#000000"}
+                        onChange={(e) => {
+                          if (selectedElement) updateElement(selectedElement.id, { stroke: e.target.value, strokeWidth: Math.max(1, (selectedElement as any).strokeWidth || 0) });
+                        }}
+                        className="w-32 h-24 rounded border-0 cursor-pointer bg-transparent"
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </ToolTip>
+          </div>
+
+          <div className="w-px h-5 bg-border/40 mx-1.5" />
+        </>
+      )}
+
+      {/* ── View section ── */}
+      <div className="flex items-center gap-0.5 relative">
+        <span className="absolute -top-0.5 left-1 text-[7px] font-semibold text-muted-foreground/25 uppercase tracking-[0.1em] select-none pointer-events-none">
+          View
+        </span>
+        <ToolTip label="Zoom Out">
+          <button
+            onClick={() => setZoom(zoom - 0.1)}
+            className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+          >
+            <ZoomOut className="w-4 h-4" />
+          </button>
+        </ToolTip>
+        <span className="text-[10px] text-muted-foreground/60 w-10 text-center select-none font-mono">
+          {Math.round(zoom * 100)}%
+        </span>
+        <ToolTip label="Zoom In">
+          <button
+            onClick={() => setZoom(zoom + 0.1)}
+            className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+          >
+            <ZoomIn className="w-4 h-4" />
+          </button>
+        </ToolTip>
+
+        {/* Fit to Screen */}
+        <ToolTip label="Fit to Screen">
+          <button
+            onClick={handleFitToScreen}
+            className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all"
+          >
+            <Maximize className="w-3.5 h-3.5" />
+          </button>
+        </ToolTip>
+      </div>
 
       {/* Spacer */}
       <div className="flex-1" />
 
       {/* Selection count badge */}
       {selectedIds.length > 1 && (
-        <span className="h-6 px-2 rounded-full bg-primary/10 text-primary text-[10px] font-semibold flex items-center mr-2">
+        <span className="h-5 px-2 rounded-full bg-primary/10 text-primary text-[9px] font-semibold flex items-center mr-1.5">
           {selectedIds.length} selected
         </span>
       )}
 
       {/* Delete selected */}
       {selectedIds.length > 0 && (
-        <button
-          onClick={deleteSelection}
-          title="Delete (Del)"
-          className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
+        <ToolTip label="Delete (Del)">
+          <button
+            onClick={deleteSelection}
+            className="h-8 w-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </ToolTip>
       )}
 
       {/* Save as Template */}
       {onSaveTemplate && (
-        <button
-          onClick={onSaveTemplate}
-          title="Save as Template"
-          className="h-8 px-3 rounded-md flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
-          <Save className="w-3.5 h-3.5" />
-          Save Template
-        </button>
+        <ToolTip label="Save as Template">
+          <button
+            onClick={onSaveTemplate}
+            className="h-7 px-2.5 rounded-lg flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all border border-transparent hover:border-border/30"
+          >
+            <Save className="w-3 h-3" />
+            Save
+          </button>
+        </ToolTip>
       )}
 
       {/* AI Agent toggle */}
       {onToggleAi && (
-        <button
-          onClick={onToggleAi}
-          title="Design Agent (Ctrl+J)"
-          className={cn(
-            "h-8 px-3 rounded-md flex items-center gap-1.5 text-xs font-medium transition-colors",
-            showAi
-              ? "bg-violet-500/15 text-violet-400"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted"
-          )}
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          Agent
-        </button>
+        <ToolTip label="Design Agent (Ctrl+J)">
+          <button
+            onClick={onToggleAi}
+            className={cn(
+              "h-7 px-2.5 rounded-lg flex items-center gap-1.5 text-[10px] font-medium transition-all border",
+              showAi
+                ? "bg-violet-500/15 text-violet-400 border-violet-500/20"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/60 border-transparent hover:border-border/30"
+            )}
+          >
+            <Sparkles className="w-3 h-3" />
+            Agent
+          </button>
+        </ToolTip>
       )}
 
-      <div className="w-px h-5 bg-border mx-1" />
+      <div className="w-px h-5 bg-border/40 mx-1" />
 
       {/* Export dropdown */}
       <div className="relative">
-        <button
-          onClick={() => setShowExportMenu((v) => !v)}
-          title="Export design"
-          className={cn(
-            "h-8 px-3 rounded-md flex items-center gap-1.5 text-xs font-medium transition-colors",
-            showExportMenu
-              ? "bg-primary/15 text-primary"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted"
-          )}
-        >
-          <Download className="w-3.5 h-3.5" />
-          Export
-          <ChevronDown className="w-3 h-3 opacity-50" />
-        </button>
+        <ToolTip label="Export design">
+          <button
+            onClick={() => setShowExportMenu((v) => !v)}
+            className={cn(
+              "h-7 px-2.5 rounded-lg flex items-center gap-1.5 text-[10px] font-medium transition-all border",
+              showExportMenu
+                ? "bg-primary/15 text-primary border-primary/20"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/60 border-transparent hover:border-border/30"
+            )}
+          >
+            <Download className="w-3 h-3" />
+            Export
+            <ChevronDown className="w-3 h-3 opacity-40" />
+          </button>
+        </ToolTip>
 
         {showExportMenu && (
           <>

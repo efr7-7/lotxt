@@ -613,8 +613,8 @@ export function DesignCanvas() {
         onMouseUp={handleStageMouseUp}
         style={{
           backgroundColor: "#ffffff",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
-          borderRadius: "4px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.2), 0 8px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05)",
+          borderRadius: "2px",
           cursor: tool === "line" || tool === "arrow" ? "crosshair" : tool === "select" ? "default" : "crosshair",
         }}
       >

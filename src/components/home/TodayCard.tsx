@@ -32,6 +32,10 @@ function getLast14Days(): string[] {
   });
 }
 
+function todayStr(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
 // ────────────────────────────────────────────
 // TodayCard
 // ────────────────────────────────────────────
@@ -43,7 +47,6 @@ export default function TodayCard() {
   const streakDays = useStreakStore((s) => s.days);
   const currentStreak = useStreakStore((s) => s.currentStreak);
   const dailyWordGoal = useStreakStore((s) => s.dailyWordGoal);
-  const getToday = useStreakStore((s) => s.getToday);
   const completedPomodoros = useFocusStore((s) => s.completedPomodoros);
 
   // ── All docs: stored + current ──
@@ -67,9 +70,20 @@ export default function TodayCard() {
     )[0];
   }, [allDocuments]);
 
-  // ── Today's progress ──
+  // ── Today's progress (derived from days array — avoids infinite loop) ──
 
-  const today = getToday();
+  const today = useMemo(() => {
+    const ts = todayStr();
+    return streakDays.find((d) => d.date === ts) ?? {
+      date: ts,
+      wordsWritten: 0,
+      documentsEdited: 0,
+      focusMinutes: 0,
+      designsCreated: 0,
+      postsPublished: 0,
+    };
+  }, [streakDays]);
+
   const wordsToday = today.wordsWritten;
   const focusMinutes = today.focusMinutes;
   const wordProgress = dailyWordGoal > 0
@@ -82,7 +96,7 @@ export default function TodayCard() {
 
   const heatmapData = useMemo(() => {
     const dayMap = new Map(streakDays.map((d) => [d.date, d]));
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const ts = todayStr();
 
     return heatmapDates.map((date) => {
       const day = dayMap.get(date);
@@ -90,7 +104,7 @@ export default function TodayCard() {
         date,
         dayOfMonth: new Date(date + "T12:00:00").getDate(),
         wordsWritten: day?.wordsWritten ?? 0,
-        isToday: date === todayStr,
+        isToday: date === ts,
       };
     });
   }, [heatmapDates, streakDays]);

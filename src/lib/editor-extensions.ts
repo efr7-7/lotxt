@@ -16,6 +16,30 @@ import Dropcursor from "@tiptap/extension-dropcursor";
 import Gapcursor from "@tiptap/extension-gapcursor";
 import Superscript from "@tiptap/extension-superscript";
 import Subscript from "@tiptap/extension-subscript";
+import { Extension } from "@tiptap/react";
+
+// Inline FontFamily extension (avoids version conflict with @tiptap/extension-font-family)
+const FontFamily = Extension.create({
+  name: "fontFamily",
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: ["textStyle"],
+        attributes: {
+          fontFamily: {
+            default: null,
+            parseHTML: (element: HTMLElement) => element.style.fontFamily?.replace(/['"]+/g, "") || null,
+            renderHTML: (attributes: Record<string, any>) => {
+              if (!attributes.fontFamily) return {};
+              return { style: `font-family: ${attributes.fontFamily}` };
+            },
+          },
+        },
+      },
+    ];
+  },
+});
 
 export function getEditorExtensions() {
   return [
@@ -59,6 +83,7 @@ export function getEditorExtensions() {
     }),
     Typography,
     TextStyle,
+    FontFamily,
     Color,
     Table.configure({
       resizable: true,

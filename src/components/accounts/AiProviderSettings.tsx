@@ -95,15 +95,33 @@ export function AiProviderSettings() {
 
   return (
     <div className="space-y-4">
+      {/* Onboarding callout when no providers connected */}
+      {providers.length === 0 && (
+        <div className="rounded-xl border border-violet-500/15 bg-violet-500/[0.03] p-5 mb-4">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0 mt-0.5">
+              <Sparkles className="w-4 h-4 text-violet-400" />
+            </div>
+            <div>
+              <h4 className="text-[13px] font-semibold text-foreground mb-1">Power up with AI</h4>
+              <p className="text-[12px] text-muted-foreground/50 leading-relaxed">
+                Connect your OpenAI, Anthropic, or other AI provider to unlock the writing
+                assistant, SEO analysis, and design agent. Your keys stay encrypted locally.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Section header */}
-      <div className="flex items-center gap-2.5 mb-4">
-        <div className="w-7 h-7 rounded-md bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center">
-          <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center">
+          <Sparkles className="w-4 h-4 text-violet-400" />
         </div>
         <div>
-          <h3 className="text-[13px] font-semibold text-foreground">AI Providers</h3>
-          <p className="text-[10px] text-muted-foreground/50">
-            Connect any LLM — your keys stay encrypted locally
+          <h3 className="text-[14px] font-semibold text-foreground">AI Providers</h3>
+          <p className="text-[11px] text-muted-foreground/50">
+            Your keys stay encrypted locally — connect any LLM
           </p>
         </div>
       </div>
@@ -125,14 +143,14 @@ export function AiProviderSettings() {
                   "group relative flex items-center gap-3 w-full rounded-xl border px-4 py-3 text-left transition-all duration-200",
                   isExpanded
                     ? "bg-accent/80 border-border/60"
-                    : "bg-card/50 border-border/30 hover:bg-accent/50 hover:border-border/50",
+                    : "bg-card/30 border-border/20 hover:bg-accent/40 hover:border-border/40",
                   isConnected && !isExpanded && "border-l-2",
                 )}
                 style={isConnected && !isExpanded ? { borderLeftColor: config.color } : undefined}
               >
                 {/* Provider icon/dot */}
                 <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                   style={{ backgroundColor: `${config.color}15` }}
                 >
                   {isConnected ? (
@@ -182,7 +200,7 @@ export function AiProviderSettings() {
 
               {/* Expanded form */}
               {isExpanded && (
-                <div className="mt-1 rounded-xl border border-border/30 bg-card/30 p-4 space-y-3">
+                <div className="mt-1 rounded-xl border border-border/30 bg-card/30 p-4 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
                   {/* API Key */}
                   <div>
                     <label className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-wider mb-1.5 block">

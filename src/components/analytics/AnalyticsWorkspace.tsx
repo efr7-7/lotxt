@@ -66,6 +66,30 @@ export default function AnalyticsWorkspace() {
         <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
         <div className="flex-1 overflow-y-auto">
+          {/* Onboarding banner */}
+          <div className="max-w-5xl mx-auto px-8 pt-6 pb-2">
+            <div className="rounded-2xl border border-primary/15 bg-primary/[0.03] p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-[15px] font-semibold text-foreground mb-1">Your Writing Analytics</h2>
+                  <p className="text-[13px] text-muted-foreground/60 leading-relaxed mb-3">
+                    Station tracks your writing journey locally. Connect a newsletter platform
+                    for subscriber growth, engagement rates, and post performance.
+                  </p>
+                  <button
+                    onClick={() => setActiveWorkspace("accounts")}
+                    className="inline-flex items-center gap-1.5 text-[12px] font-medium text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Connect a platform <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <LocalStatsOverview />
         </div>
       </div>

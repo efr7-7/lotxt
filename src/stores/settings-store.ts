@@ -105,8 +105,8 @@ function applyThemeToDOM(preset: ThemePreset | undefined, mode: ThemeMode) {
 export const useSettingsStore = create<SettingsState>((set, get) => ({
   autoSaveInterval: stored.autoSaveInterval ?? 30_000,
   defaultExportFormat: stored.defaultExportFormat ?? "html",
-  editorFontSize: stored.editorFontSize ?? 15,
-  editorLineHeight: stored.editorLineHeight ?? 1.75,
+  editorFontSize: stored.editorFontSize ?? 16,
+  editorLineHeight: stored.editorLineHeight ?? 1.8,
   accentColor: stored.accentColor ?? "262 83% 58%",
   themeMode: (stored as any).themeMode ?? "dark",
   themePresetId: (stored as any).themePresetId ?? "midnight",

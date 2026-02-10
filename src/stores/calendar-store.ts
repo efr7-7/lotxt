@@ -37,6 +37,8 @@ interface CalendarState {
   setViewMode: (mode: "month" | "week") => void;
   setSelectedDate: (date: Date | null) => void;
   fetchEvents: (year: number, month: number) => Promise<void>;
+  addQuickEvent: (date: string, title: string) => void;
+  removeEvent: (id: string) => void;
   schedulePost: (params: {
     documentId: string;
     platform: string;
@@ -78,6 +80,24 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   setViewMode: (mode) => set({ viewMode: mode }),
   setSelectedDate: (date) => set({ selectedDate: date }),
+
+  addQuickEvent: (date, title) => {
+    const id = `draft-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const event: CalendarEvent = {
+      id,
+      title,
+      date,
+      eventType: "draft",
+      platform: null,
+      status: "draft",
+      documentId: null,
+    };
+    set((state) => ({ events: [...state.events, event] }));
+  },
+
+  removeEvent: (id) => {
+    set((state) => ({ events: state.events.filter((e) => e.id !== id) }));
+  },
 
   fetchEvents: async (year, month) => {
     set({ isLoading: true });

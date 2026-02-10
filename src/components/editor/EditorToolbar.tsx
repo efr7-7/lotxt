@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough, Code,
   Heading1, Heading2, Heading3,
@@ -9,6 +9,7 @@ import {
   Search, ChevronDown,
   Download, FileText, FileImage,
   Send, Sparkles, FolderOpen, Layers, History, LayoutTemplate, Target,
+  Type,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editor-store";
@@ -66,8 +67,38 @@ export function EditorToolbar({ onToggleFind, onToggleAi, showAi, onToggleDocLis
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showGoalPicker, setShowGoalPicker] = useState(false);
+  const [showFontPicker, setShowFontPicker] = useState(false);
+  const fontPickerRef = useRef<HTMLDivElement>(null);
   const startSession = useSessionStore((s) => s.startSession);
   const currentSession = useSessionStore((s) => s.currentSession);
+
+  const fontSections = [
+    {
+      label: "Sans Serif",
+      fonts: ["Inter", "Open Sans", "Roboto", "Montserrat", "Poppins", "Lato", "Nunito", "DM Sans", "Space Grotesk", "Plus Jakarta Sans"],
+    },
+    {
+      label: "Serif",
+      fonts: ["Playfair Display", "Merriweather", "Georgia", "Lora", "Source Serif 4", "Crimson Text"],
+    },
+    {
+      label: "Monospace",
+      fonts: ["JetBrains Mono", "Fira Code", "Source Code Pro", "Courier New"],
+    },
+  ];
+
+  const currentFont = editor?.getAttributes("textStyle").fontFamily || "Inter";
+
+  useEffect(() => {
+    if (!showFontPicker) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (fontPickerRef.current && !fontPickerRef.current.contains(e.target as Node)) {
+        setShowFontPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showFontPicker]);
 
   const insertLink = () => {
     if (!editor) return;
@@ -161,6 +192,53 @@ export function EditorToolbar({ onToggleFind, onToggleAi, showAi, onToggleDocLis
           <ToolBtn onClick={() => editor?.chain().focus().redo().run()} disabled={!editor?.can().redo()} title="Redo (Ctrl+Shift+Z)">
             <Redo2 className="w-3.5 h-3.5" />
           </ToolBtn>
+          <Sep />
+          {/* Font family picker */}
+          <div className="relative" ref={fontPickerRef}>
+            <button
+              onClick={() => setShowFontPicker(!showFontPicker)}
+              className={cn(
+                "h-7 w-[100px] rounded-md flex items-center justify-between px-2 text-[11px] font-medium transition-all duration-75",
+                showFontPicker
+                  ? "bg-primary/12 text-primary shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.15)]"
+                  : "text-muted-foreground/60 hover:text-foreground hover:bg-accent/80",
+              )}
+              title="Font Family"
+            >
+              <span className="truncate" style={{ fontFamily: currentFont }}>{currentFont}</span>
+              <ChevronDown className="w-3 h-3 ml-1 opacity-50 shrink-0" />
+            </button>
+            {showFontPicker && (
+              <div className="absolute left-0 top-full mt-1 z-50 w-56 bg-popover/95 backdrop-blur-md border border-border/50 rounded-lg shadow-overlay overflow-hidden">
+                <div className="max-h-[320px] overflow-y-auto p-1.5">
+                  {fontSections.map((section, si) => (
+                    <div key={section.label}>
+                      {si > 0 && <div className="h-px bg-border/30 my-1.5 mx-1" />}
+                      <p className="text-[10px] text-muted-foreground/60 font-medium mb-1 px-1.5 pt-1">{section.label}</p>
+                      {section.fonts.map((font) => (
+                        <button
+                          key={font}
+                          onClick={() => {
+                            editor?.chain().focus().setMark("textStyle", { fontFamily: font }).run();
+                            setShowFontPicker(false);
+                          }}
+                          className={cn(
+                            "flex items-center w-full px-2.5 py-1.5 rounded-md text-[12px] transition-colors",
+                            currentFont === font
+                              ? "bg-primary/10 text-primary font-medium"
+                              : "text-muted-foreground hover:text-foreground hover:bg-accent/80",
+                          )}
+                          style={{ fontFamily: font }}
+                        >
+                          {font}
+                        </button>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
           <Sep />
           <ToolBtn onClick={() => editor?.chain().focus().toggleBold().run()} isActive={editor?.isActive("bold") ?? false} title="Bold (Ctrl+B)">
             <Bold className="w-3.5 h-3.5" />

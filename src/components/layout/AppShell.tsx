@@ -5,6 +5,8 @@ import { WorkspaceContainer } from "./WorkspaceContainer";
 import { CommandPalette } from "@/components/command-palette/CommandPalette";
 import { ToastContainer } from "@/components/shared/Toast";
 import { FocusTimer } from "@/components/shared/FocusTimer";
+import { QuickCapture } from "@/components/shared/QuickCapture";
+import { Celebration } from "@/components/shared/Celebration";
 import { WifiOff, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -71,6 +73,8 @@ export function AppShell() {
         </main>
       </div>
       <FocusTimer />
+      <QuickCapture />
+      <Celebration />
       <CommandPalette />
       <ToastContainer />
     </div>

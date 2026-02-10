@@ -50,10 +50,10 @@ export function CommandPalette() {
         onClick={close}
       />
 
-      {/* Palette */}
-      <div className="relative w-full max-w-lg bg-popover border border-border rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+      {/* Palette — glass-morphism overlay */}
+      <div className="relative w-full max-w-lg bg-popover/90 backdrop-blur-xl border border-border/50 rounded-2xl shadow-overlay overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
         {/* Search input */}
-        <div className="flex items-center border-b border-border px-4">
+        <div className="flex items-center border-b border-border/40 px-4">
           <svg
             className="w-4 h-4 text-muted-foreground shrink-0"
             fill="none"

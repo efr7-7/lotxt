@@ -21,9 +21,12 @@ import {
   FolderInput,
   ChevronDown,
   GripVertical,
+  Tag,
 } from "lucide-react";
 import { ImportDialog } from "./ImportDialog";
 import { DocumentStatusBadge } from "./DocumentStatusBadge";
+import { TagFilter } from "./TagFilter";
+import { TagEditor } from "./TagEditor";
 import { cn } from "@/lib/utils";
 
 // ─── Types ───────────────────────────────────────────────────────────
@@ -35,6 +38,7 @@ interface DocMeta {
   wordCount: number;
   projectId: string | null;
   status: DocumentStatus;
+  tags: string[];
 }
 
 type SortKey = "name" | "date" | "words";
@@ -114,6 +118,10 @@ export function DocumentList({ onClose }: { onClose: () => void }) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [showImport, setShowImport] = useState(false);
+
+  // Tag filter + editor state
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [editingTagDocId, setEditingTagDocId] = useState<string | null>(null);
 
   // New feature states
   const [pinnedIds, setPinnedIds] = useState<Set<string>>(() =>
@@ -198,6 +206,7 @@ export function DocumentList({ onClose }: { onClose: () => void }) {
             wordCount: m.word_count,
             projectId: m.project_id || null,
             status: (m.status as DocumentStatus) || "draft",
+            tags: m.tags ?? [],
           })),
         );
       } catch {
@@ -220,6 +229,7 @@ export function DocumentList({ onClose }: { onClose: () => void }) {
       wordCount: currentDocument.wordCount,
       projectId: currentDocument.projectId,
       status: currentDocument.status,
+      tags: currentDocument.tags ?? [],
     });
     seenIds.add(currentDocument.id);
 
@@ -233,6 +243,7 @@ export function DocumentList({ onClose }: { onClose: () => void }) {
           wordCount: doc.wordCount,
           projectId: doc.projectId,
           status: doc.status,
+          tags: doc.tags ?? [],
         });
         seenIds.add(doc.id);
       }
@@ -282,6 +293,11 @@ export function DocumentList({ onClose }: { onClose: () => void }) {
       docs = docs.filter((d) => !archivedIds.has(d.id));
     }
 
+    // Tag filter
+    if (activeTag) {
+      docs = docs.filter((d) => d.tags.includes(activeTag));
+    }
+
     // Search filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
@@ -314,6 +330,7 @@ export function DocumentList({ onClose }: { onClose: () => void }) {
     projectFiltered,
     showArchived,
     archivedIds,
+    activeTag,
     searchQuery,
     sortKey,
     pinnedIds,
@@ -786,6 +803,21 @@ export function DocumentList({ onClose }: { onClose: () => void }) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+                  setEditingTagDocId(editingTagDocId === doc.id ? null : doc.id);
+                }}
+                className={cn(
+                  "h-5 w-5 rounded flex items-center justify-center transition-colors",
+                  editingTagDocId === doc.id
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10",
+                )}
+                title="Tags"
+              >
+                <Tag className="w-2.5 h-2.5" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
                   setRenamingId(doc.id);
                   setRenameValue(doc.title);
                 }}
@@ -807,6 +839,13 @@ export function DocumentList({ onClose }: { onClose: () => void }) {
                 </button>
               )}
             </div>
+
+            {/* Inline tag editor */}
+            {editingTagDocId === doc.id && (
+              <div className="mt-1.5 pl-[28px]" onClick={(e) => e.stopPropagation()}>
+                <TagEditor docId={doc.id} tags={doc.tags} onClose={() => setEditingTagDocId(null)} />
+              </div>
+            )}
           </>
         )}
       </div>
@@ -1025,6 +1064,9 @@ export function DocumentList({ onClose }: { onClose: () => void }) {
             </button>
           )}
         </div>
+
+        {/* Tag filter pills */}
+        <TagFilter activeTag={activeTag} onTagSelect={setActiveTag} />
 
         {/* Controls row: Sort, View toggle, Archive toggle */}
         <div className="flex items-center justify-between">

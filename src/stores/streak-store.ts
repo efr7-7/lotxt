@@ -20,6 +20,7 @@ export interface StreakState {
   totalFocusMinutesAllTime: number;
   totalPostsAllTime: number;
   weeklyGoal: number; // days per week target (default 5)
+  dailyWordGoal: number; // words per day target (default 500)
 
   /* ── Actions ── */
   recordActivity: (type: keyof Omit<DayActivity, "date">, amount: number) => void;
@@ -27,6 +28,7 @@ export interface StreakState {
   getWeek: () => DayActivity[];
   getMonth: () => DayActivity[];
   setWeeklyGoal: (days: number) => void;
+  setDailyWordGoal: (words: number) => void;
   computeStreak: () => void;
 }
 
@@ -58,6 +60,7 @@ function saveToStorage(state: StreakState) {
       totalFocusMinutesAllTime: state.totalFocusMinutesAllTime,
       totalPostsAllTime: state.totalPostsAllTime,
       weeklyGoal: state.weeklyGoal,
+      dailyWordGoal: state.dailyWordGoal,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch {}
@@ -125,6 +128,7 @@ export const useStreakStore = create<StreakState>((set, get) => ({
   totalFocusMinutesAllTime: stored.totalFocusMinutesAllTime ?? 0,
   totalPostsAllTime: stored.totalPostsAllTime ?? 0,
   weeklyGoal: stored.weeklyGoal ?? 5,
+  dailyWordGoal: (stored as any).dailyWordGoal ?? 500,
 
   recordActivity: (type, amount) => {
     const state = get();
@@ -212,6 +216,11 @@ export const useStreakStore = create<StreakState>((set, get) => ({
 
   setWeeklyGoal: (days) => {
     set({ weeklyGoal: days });
+    saveToStorage(get());
+  },
+
+  setDailyWordGoal: (words) => {
+    set({ dailyWordGoal: words });
     saveToStorage(get());
   },
 

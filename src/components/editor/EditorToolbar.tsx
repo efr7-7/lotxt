@@ -8,11 +8,12 @@ import {
   Highlighter, Undo2, Redo2,
   Search, ChevronDown,
   Download, FileText, FileImage,
-  Send, Sparkles, FolderOpen, Layers, History, LayoutTemplate,
+  Send, Sparkles, FolderOpen, Layers, History, LayoutTemplate, Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/stores/editor-store";
 import { useEditorInstance } from "./EditorContext";
+import { useSessionStore } from "@/stores/session-store";
 import { PublishDialog } from "@/components/accounts/PublishDialog";
 import { PreFlightChecklist } from "./PreFlightChecklist";
 import { ImageUploadDialog } from "./ImageUploadDialog";
@@ -64,6 +65,9 @@ export function EditorToolbar({ onToggleFind, onToggleAi, showAi, onToggleDocLis
   const [showExport, setShowExport] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+  const [showGoalPicker, setShowGoalPicker] = useState(false);
+  const startSession = useSessionStore((s) => s.startSession);
+  const currentSession = useSessionStore((s) => s.currentSession);
 
   const insertLink = () => {
     if (!editor) return;
@@ -268,6 +272,63 @@ export function EditorToolbar({ onToggleFind, onToggleAi, showAi, onToggleDocLis
             >
               <History className="w-3 h-3" />
             </button>
+            {/* Word goal button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowGoalPicker(!showGoalPicker)}
+                className={cn(
+                  "h-5 px-1.5 rounded flex items-center gap-1 text-[10.5px] font-medium transition-colors",
+                  currentSession?.isActive
+                    ? "text-emerald-500 bg-emerald-500/10"
+                    : "text-muted-foreground/50 hover:text-foreground hover:bg-accent/70",
+                )}
+                title="Set word goal"
+              >
+                <Target className="w-3 h-3" />
+              </button>
+              {showGoalPicker && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowGoalPicker(false)} />
+                  <div className="absolute left-0 top-full mt-1 z-50 w-48 bg-popover/95 backdrop-blur-md border border-border/50 rounded-lg shadow-overlay overflow-hidden p-2">
+                    <p className="text-[10px] text-muted-foreground/60 font-medium mb-1.5 px-1">Set word goal</p>
+                    <div className="grid grid-cols-2 gap-1">
+                      {[250, 500, 1000, 1500].map((goal) => (
+                        <button
+                          key={goal}
+                          onClick={() => {
+                            startSession(goal);
+                            setShowGoalPicker(false);
+                            toast.success(`Goal set: ${goal} words`);
+                          }}
+                          className="h-7 rounded-md text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent/80 transition-colors tabular-nums"
+                        >
+                          {goal.toLocaleString()} words
+                        </button>
+                      ))}
+                    </div>
+                    <div className="border-t border-border/30 mt-1.5 pt-1.5">
+                      <input
+                        type="number"
+                        placeholder="Custom goal..."
+                        min={50}
+                        className="w-full h-7 px-2 rounded-md border border-border/30 bg-background/50 text-[11px] text-foreground placeholder:text-muted-foreground/40 outline-none focus:ring-1 focus:ring-ring/40"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            const val = parseInt((e.target as HTMLInputElement).value);
+                            if (val >= 50) {
+                              startSession(val);
+                              setShowGoalPicker(false);
+                              toast.success(`Goal set: ${val} words`);
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
             <span className="text-muted-foreground/20">·</span>
             <span className="text-[10.5px] text-muted-foreground/45 tabular-nums font-medium">
               {wordCount.toLocaleString()} words

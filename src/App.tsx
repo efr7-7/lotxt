@@ -6,6 +6,7 @@ import { useWorkspaceStore, type WorkspaceId } from "@/stores/workspace-store";
 import { useOnboardingStore } from "@/stores/onboarding-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { useEditorStore } from "@/stores/editor-store";
+import { useCaptureStore } from "@/stores/capture-store";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { ShortcutHelp } from "@/components/shared/ShortcutHelp";
 import { toast } from "@/stores/toast-store";
@@ -280,6 +281,14 @@ export default function App() {
         },
       },
       {
+        id: "general:quick-capture",
+        label: "Quick Capture",
+        description: "Jot down an idea instantly",
+        shortcut: "Ctrl+.",
+        category: "general",
+        action: () => useCaptureStore.getState().openCapture(),
+      },
+      {
         id: "editor:save",
         label: "Save Document",
         description: "Save the current document",
@@ -371,6 +380,12 @@ export default function App() {
           e.preventDefault();
           setActiveWorkspace(workspaceMap[e.key]);
         }
+      }
+
+      // Ctrl+. => Quick Capture
+      if ((e.metaKey || e.ctrlKey) && e.key === ".") {
+        e.preventDefault();
+        useCaptureStore.getState().openCapture();
       }
 
       // Ctrl+Shift+T for theme toggle

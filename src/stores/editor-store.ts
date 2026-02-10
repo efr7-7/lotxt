@@ -35,6 +35,9 @@ interface EditorState {
   loadDocument: (id: string) => boolean;
   deleteDocument: (id: string) => void;
   renameDocument: (id: string, title: string) => void;
+  addTag: (docId: string, tag: string) => void;
+  removeTag: (docId: string, tag: string) => void;
+  getAllTags: () => string[];
   markDirty: () => void;
   markClean: () => void;
   setSaveStatus: (status: SaveStatus) => void;
@@ -205,6 +208,55 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         ),
       };
     }),
+
+  addTag: (docId, tag) =>
+    set((state) => {
+      const normalizedTag = tag.trim().toLowerCase();
+      if (!normalizedTag) return state;
+      if (state.currentDocument.id === docId) {
+        if (state.currentDocument.tags.includes(normalizedTag)) return state;
+        return {
+          currentDocument: {
+            ...state.currentDocument,
+            tags: [...state.currentDocument.tags, normalizedTag],
+          },
+        };
+      }
+      return {
+        documents: state.documents.map((d) =>
+          d.id === docId && !d.tags.includes(normalizedTag)
+            ? { ...d, tags: [...d.tags, normalizedTag] }
+            : d,
+        ),
+      };
+    }),
+
+  removeTag: (docId, tag) =>
+    set((state) => {
+      if (state.currentDocument.id === docId) {
+        return {
+          currentDocument: {
+            ...state.currentDocument,
+            tags: state.currentDocument.tags.filter((t) => t !== tag),
+          },
+        };
+      }
+      return {
+        documents: state.documents.map((d) =>
+          d.id === docId ? { ...d, tags: d.tags.filter((t) => t !== tag) } : d,
+        ),
+      };
+    }),
+
+  getAllTags: () => {
+    const state = get();
+    const allDocs = [state.currentDocument, ...state.documents];
+    const tags = new Set<string>();
+    for (const doc of allDocs) {
+      for (const tag of doc.tags) tags.add(tag);
+    }
+    return Array.from(tags).sort();
+  },
 
   markDirty: () => set({ isDirty: true }),
   markClean: () => set({ isDirty: false }),

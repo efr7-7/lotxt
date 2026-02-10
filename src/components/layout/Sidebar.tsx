@@ -23,14 +23,16 @@ const NAV_ITEMS: {
   icon: typeof FileText;
   label: string;
   shortcut: string;
+  accentColor: string;
+  activeIconColor: string;
 }[] = [
-  { id: "home", icon: Home, label: "Home", shortcut: "0" },
-  { id: "editor", icon: FileText, label: "Editor", shortcut: "1" },
-  { id: "canvas", icon: Paintbrush, label: "Canvas", shortcut: "2" },
-  { id: "analytics", icon: BarChart3, label: "Analytics", shortcut: "3" },
-  { id: "accounts", icon: Users, label: "Accounts", shortcut: "4" },
-  { id: "distribute", icon: Sparkles, label: "Distribute", shortcut: "5" },
-  { id: "calendar", icon: CalendarDays, label: "Calendar", shortcut: "6" },
+  { id: "home", icon: Home, label: "Home", shortcut: "0", accentColor: "hsl(252, 56%, 57%)", activeIconColor: "text-primary" },
+  { id: "editor", icon: FileText, label: "Editor", shortcut: "1", accentColor: "hsl(217, 91%, 60%)", activeIconColor: "text-blue-500" },
+  { id: "canvas", icon: Paintbrush, label: "Canvas", shortcut: "2", accentColor: "hsl(271, 60%, 55%)", activeIconColor: "text-violet-500" },
+  { id: "analytics", icon: BarChart3, label: "Analytics", shortcut: "3", accentColor: "hsl(172, 66%, 42%)", activeIconColor: "text-teal-500" },
+  { id: "accounts", icon: Users, label: "Accounts", shortcut: "4", accentColor: "hsl(252, 56%, 57%)", activeIconColor: "text-primary" },
+  { id: "distribute", icon: Sparkles, label: "Distribute", shortcut: "5", accentColor: "hsl(38, 92%, 50%)", activeIconColor: "text-amber-500" },
+  { id: "calendar", icon: CalendarDays, label: "Calendar", shortcut: "6", accentColor: "hsl(0, 72%, 51%)", activeIconColor: "text-rose-500" },
 ];
 
 export function Sidebar() {
@@ -131,7 +133,7 @@ export function Sidebar() {
         ref={navRef}
         className="flex flex-col items-center gap-[2px] flex-1 pt-2 pb-1 relative"
       >
-        {/* Enhancement 1: Animated sliding active indicator pill */}
+        {/* Enhancement 1: Animated sliding active indicator pill with workspace accent */}
         <div
           className="absolute left-0 w-[2.5px] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
           style={{
@@ -140,10 +142,13 @@ export function Sidebar() {
             opacity: indicatorY !== null ? 1 : 0,
           }}
         >
-          <div className="w-full h-full bg-foreground/70 rounded-r-full" />
+          <div
+            className="w-full h-full rounded-r-full transition-colors duration-300"
+            style={{ backgroundColor: NAV_ITEMS.find((n) => n.id === activeWorkspace)?.accentColor ?? "hsl(var(--foreground) / 0.7)" }}
+          />
         </div>
 
-        {NAV_ITEMS.map(({ id, icon: Icon, label, shortcut }, index) => {
+        {NAV_ITEMS.map(({ id, icon: Icon, label, shortcut, activeIconColor }, index) => {
           const isActive = activeWorkspace === id;
           return (
             <div
@@ -170,11 +175,11 @@ export function Sidebar() {
                     : "text-muted-foreground/50 hover:text-foreground/80 hover:bg-accent/60",
                 )}
               >
-                {/* Enhancement 2: Icon scale + stroke transition */}
+                {/* Enhancement 2: Icon scale + accent color per workspace */}
                 <Icon
                   className={cn(
-                    "w-[15px] h-[15px] transition-transform duration-200 ease-out",
-                    isActive && "scale-105",
+                    "w-[15px] h-[15px] transition-all duration-200 ease-out",
+                    isActive ? `scale-105 ${activeIconColor}` : "",
                   )}
                   strokeWidth={isActive ? 2 : 1.5}
                 />

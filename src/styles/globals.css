@@ -11,26 +11,27 @@
 
 @layer base {
   :root {
-    --background: 0 0% 99%;
+    /* Warmed palette — Craft-inspired warmth vs clinical white */
+    --background: 40 20% 98.5%;
     --foreground: 240 6% 10%;
-    --card: 0 0% 100%;
+    --card: 40 15% 99.5%;
     --card-foreground: 240 6% 10%;
-    --popover: 0 0% 100%;
+    --popover: 40 10% 99%;
     --popover-foreground: 240 6% 10%;
     --primary: 252 56% 57%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 4% 95%;
+    --secondary: 35 8% 95%;
     --secondary-foreground: 240 6% 10%;
-    --muted: 240 5% 96%;
+    --muted: 35 8% 96%;
     --muted-foreground: 240 4% 46%;
-    --accent: 240 5% 94%;
+    --accent: 35 6% 94%;
     --accent-foreground: 240 6% 10%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
+    --border: 35 8% 89%;
+    --input: 35 8% 89%;
     --ring: 252 56% 57%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --success: 152 69% 31%;
     --warning: 38 92% 50%;
@@ -42,7 +43,7 @@
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -4px rgba(0,0,0,0.04);
     --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
 
-    --surface-glass: 0 0% 100% / 0.7;
+    --surface-glass: 40 15% 99% / 0.75;
     --glow-primary: 252 56% 57% / 0.15;
   }
 
@@ -165,8 +166,8 @@
   letter-spacing: -0.015em;
 }
 .tiptap-editor p {
-  @apply my-3 leading-[1.75];
-  font-size: 15px;
+  @apply my-3 leading-[1.8];
+  font-size: 16px;
   color: hsl(var(--foreground) / 0.88);
 }
 .tiptap-editor ul {
@@ -461,4 +462,80 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 6px;
+}
+
+/* ============================================
+   Magician Animations — Celebrations & Delight
+   ============================================ */
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes goal-pulse {
+  0% { transform: scaleX(1); }
+  50% { transform: scaleX(1.02); }
+  100% { transform: scaleX(1); }
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+
+@keyframes heatmap-pop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes sparkle-glow {
+  0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+  50% { box-shadow: 0 0 20px 4px hsl(var(--primary) / 0.3); }
+  100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+}
+
+@keyframes promote-transform {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+  40% { transform: scale(1.05); box-shadow: 0 0 15px 3px hsl(var(--primary) / 0.2); }
+  100% { transform: scale(0.95); opacity: 0; box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+}
+
+/* Heatmap cell utility */
+.heatmap-cell {
+  border-radius: 3px;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.heatmap-cell:hover {
+  transform: scale(1.4);
+  z-index: 10;
+}
+
+/* Sparkle capture — brief glow for Quick Capture success */
+.sparkle-capture {
+  animation: sparkle-glow 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Promote transform — idea → document transformation */
+.promote-transform {
+  animation: promote-transform 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Goal pulse — progress bar celebration */
+.goal-pulse {
+  animation: goal-pulse 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Progress bar fill animation */
+.animate-progress-fill {
+  animation: progress-fill 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }

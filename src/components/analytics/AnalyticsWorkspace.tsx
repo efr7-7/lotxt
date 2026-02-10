@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAnalyticsStore } from "@/stores/analytics-store";
 import { useAccountsStore } from "@/stores/accounts-store";
+import { LocalStatsOverview } from "./LocalStatsOverview";
 import { MetricCard } from "./MetricCard";
 import { SubscriberChart } from "./SubscriberChart";
 import { EngagementChart } from "./EngagementChart";
@@ -57,34 +58,15 @@ export default function AnalyticsWorkspace() {
     }
   }, [connectedAccounts.length]);
 
-  // No accounts connected — show empty state (only for overview)
+  // No accounts connected — show local stats + connect CTA (overview tab)
   if (connectedAccounts.length === 0 && !isLoading && activeTab === "overview") {
     return (
       <div className="h-full flex flex-col">
         {/* Tab bar */}
         <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center max-w-md">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/10 flex items-center justify-center mx-auto mb-5">
-              <BarChart3 className="w-7 h-7 text-primary/60" />
-            </div>
-            <h2 className="text-lg font-semibold text-foreground/90 mb-2">
-              Your analytics dashboard
-            </h2>
-            <p className="text-[13px] text-muted-foreground/50 mb-6 leading-relaxed max-w-[320px] mx-auto">
-              Connect a newsletter platform to see subscriber growth, engagement rates, and post performance in real time.
-            </p>
-            <button
-              onClick={() => setActiveWorkspace("accounts")}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-[13px] font-medium hover:bg-primary/90 transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]"
-            >
-              Connect Account <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-            <p className="text-[11px] text-muted-foreground/30 mt-4">
-              Supports Beehiiv, Substack, and Kit
-            </p>
-          </div>
+        <div className="flex-1 overflow-y-auto">
+          <LocalStatsOverview />
         </div>
       </div>
     );

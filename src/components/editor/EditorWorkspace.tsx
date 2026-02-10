@@ -9,8 +9,10 @@ import { DocumentList } from "./DocumentList";
 import { ProjectSidebar } from "./ProjectSidebar";
 import { VersionHistory } from "./VersionHistory";
 import { ImportDialog } from "./ImportDialog";
+import { SessionGoalBar } from "./SessionGoalBar";
 import { useEditorStore } from "@/stores/editor-store";
 import { useSettingsStore } from "@/stores/settings-store";
+import { cn } from "@/lib/utils";
 import { X, Sparkles, BarChart3, Send } from "lucide-react";
 
 // ─── First-Run Hints ───
@@ -58,6 +60,7 @@ export default function EditorWorkspace() {
   const [showDocList, setShowDocList] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [zenMode, setZenMode] = useState(false);
 
   // First-run hints state
   const [showWelcome, setShowWelcome] = useState(() => {
@@ -93,6 +96,12 @@ export default function EditorWorkspace() {
   // Ctrl+H / Ctrl+F global shortcut
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // Ctrl+Shift+Z for Zen mode (careful: Ctrl+Z is undo)
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "Z") {
+        e.preventDefault();
+        setZenMode((v) => !v);
+        return;
+      }
       if ((e.ctrlKey || e.metaKey) && (e.key === "h" || e.key === "f")) {
         e.preventDefault();
         setShowFind(true);
@@ -120,28 +129,43 @@ export default function EditorWorkspace() {
   return (
     <EditorProvider>
       <div className="h-full flex">
+        {zenMode && (
+          <button
+            onClick={() => setZenMode(false)}
+            className="fixed top-4 right-4 z-40 px-3 py-1.5 rounded-lg text-[11px] font-medium text-muted-foreground/40 hover:text-foreground bg-card/80 backdrop-blur-sm border border-border/30 shadow-sm opacity-0 hover:opacity-100 transition-all duration-300"
+            title="Exit Zen Mode (Ctrl+Shift+Z)"
+          >
+            Exit Zen
+          </button>
+        )}
+
         {/* Projects sidebar */}
-        {showProjects && <ProjectSidebar onClose={() => setShowProjects(false)} />}
+        {!zenMode && showProjects && <ProjectSidebar onClose={() => setShowProjects(false)} />}
 
         {/* Document list panel */}
-        {showDocList && <DocumentList onClose={() => setShowDocList(false)} />}
+        {!zenMode && showDocList && <DocumentList onClose={() => setShowDocList(false)} />}
 
         {/* Main editor area */}
         <div className="flex-1 flex flex-col min-w-0">
-          <EditorToolbar
-            onToggleFind={toggleFind}
-            onToggleAi={toggleAi}
-            showAi={showAi}
-            onToggleDocList={() => setShowDocList((v) => !v)}
-            showDocList={showDocList}
-            onToggleProjects={() => setShowProjects((v) => !v)}
-            showProjects={showProjects}
-            onToggleVersionHistory={() => setShowVersionHistory((v) => !v)}
-            showVersionHistory={showVersionHistory}
-          />
+          {!zenMode && (
+            <EditorToolbar
+              onToggleFind={toggleFind}
+              onToggleAi={toggleAi}
+              showAi={showAi}
+              onToggleDocList={() => setShowDocList((v) => !v)}
+              showDocList={showDocList}
+              onToggleProjects={() => setShowProjects((v) => !v)}
+              showProjects={showProjects}
+              onToggleVersionHistory={() => setShowVersionHistory((v) => !v)}
+              showVersionHistory={showVersionHistory}
+            />
+          )}
+
+          {/* Writing session goal progress bar */}
+          {!zenMode && <SessionGoalBar />}
 
           {/* First-run feature hints */}
-          {(hintsState.publish || hintsState.ai || hintsState.insights) && (
+          {!zenMode && (hintsState.publish || hintsState.ai || hintsState.insights) && (
             <div className="flex items-center gap-2 px-4 py-1.5 bg-muted/30 border-b border-border/20">
               <span className="text-[10px] text-muted-foreground/40 font-medium mr-1">Tips:</span>
               {hintsState.publish && (
@@ -185,7 +209,7 @@ export default function EditorWorkspace() {
             {showWelcome && <WelcomeBanner onDismiss={dismissWelcome} />}
 
             <div
-              className="max-w-[720px] mx-auto px-10 py-8"
+              className={cn("mx-auto px-10 py-8", zenMode ? "max-w-[800px] pt-16" : "max-w-[720px]")}
               style={{ fontSize: `${editorFontSize}px`, lineHeight: editorLineHeight }}
             >
               {/* Document title — professional treatment */}
@@ -205,17 +229,17 @@ export default function EditorWorkspace() {
         </div>
 
         {/* Version History panel */}
-        {showVersionHistory && !showAi && (
+        {!zenMode && showVersionHistory && !showAi && (
           <div className="w-64 border-l border-border bg-card/50 shrink-0">
             <VersionHistory onClose={() => setShowVersionHistory(false)} />
           </div>
         )}
 
         {/* AI Assistant panel */}
-        <AiAssistant isOpen={showAi} onClose={() => setShowAi(false)} />
+        {!zenMode && <AiAssistant isOpen={showAi} onClose={() => setShowAi(false)} />}
 
         {/* Right sidebar (outline/details) */}
-        {!showAi && !showVersionHistory && <EditorSidebar />}
+        {!zenMode && !showAi && !showVersionHistory && <EditorSidebar />}
 
         {/* Import dialog */}
         {showImportDialog && (

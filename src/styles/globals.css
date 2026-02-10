@@ -41,6 +41,9 @@
     --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04);
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -4px rgba(0,0,0,0.04);
     --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+
+    --surface-glass: 0 0% 100% / 0.7;
+    --glow-primary: 252 56% 57% / 0.15;
   }
 
   .dark {
@@ -73,10 +76,19 @@
     --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.3);
     --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.6), 0 8px 10px -6px rgba(0,0,0,0.4);
+
+    --surface-glass: 0 0% 8% / 0.7;
+    --glow-primary: 252 56% 62% / 0.25;
   }
 }
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   * {
     @apply border-border;
   }
@@ -114,6 +126,10 @@
 
   ::selection {
     background: hsl(var(--primary) / 0.2);
+  }
+
+  .dark ::selection {
+    background: hsl(var(--primary) / 0.3);
   }
 }
 
@@ -165,9 +181,15 @@
 .tiptap-editor li p {
   @apply my-0;
 }
+.tiptap-editor p + p {
+  margin-top: 0;
+}
 .tiptap-editor blockquote {
   @apply border-l-[3px] border-primary/40 pl-5 my-5 not-italic;
   color: hsl(var(--foreground) / 0.75);
+  background: hsl(var(--muted) / 0.3);
+  border-radius: 0 6px 6px 0;
+  padding: 12px 16px 12px 20px;
 }
 .tiptap-editor blockquote p {
   color: inherit;
@@ -266,6 +288,64 @@
   color: hsl(var(--muted-foreground) / 0.5);
 }
 
+/* Heading placeholders */
+.tiptap-editor h1.is-empty::before,
+.tiptap-editor h2.is-empty::before,
+.tiptap-editor h3.is-empty::before {
+  color: hsl(var(--muted-foreground) / 0.3);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Task list styles */
+.tiptap-editor ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+  margin: 8px 0;
+}
+.tiptap-editor ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 4px 0;
+}
+.tiptap-editor ul[data-type="taskList"] li > label {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.tiptap-editor ul[data-type="taskList"] li > label input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid hsl(var(--border));
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.tiptap-editor ul[data-type="taskList"] li > label input[type="checkbox"]:checked {
+  background: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+.tiptap-editor ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid hsl(var(--primary-foreground));
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.tiptap-editor ul[data-type="taskList"] li[data-checked="true"] > div > p {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
 /* ============================================
    Frameless window chrome
    ============================================ */
@@ -288,4 +368,97 @@
   .shadow-float { box-shadow: var(--shadow-lg); }
   .shadow-overlay { box-shadow: var(--shadow-xl); }
   .text-balance { text-wrap: balance; }
+
+  /* Focus ring — animated, accessible */
+  .focus-ring:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--primary) / 0.5);
+    transition: box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Glass panel — frosted overlay */
+  .glass {
+    background: hsl(var(--surface-glass));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  /* Button press micro-interaction */
+  .btn-press:active {
+    transform: scale(0.97);
+    transition-duration: 50ms;
+  }
+
+  /* Scroll-fade: scrollbar appears only on hover */
+  .scroll-fade::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scroll-fade::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scroll-fade::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 10px;
+    transition: background 0.2s ease;
+  }
+  .scroll-fade:hover::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.15);
+  }
+  .scroll-fade:hover::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.3);
+  }
+}
+
+/* ============================================
+   Keyframe Animations — Entrance & Loading
+   ============================================ */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out both;
+}
+.animate-slide-up {
+  animation: slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-slide-down {
+  animation: slide-down 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-scale-in {
+  animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Loading skeleton shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.08) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 6px;
 }

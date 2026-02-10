@@ -5,13 +5,16 @@ import { WorkspaceContainer } from "./WorkspaceContainer";
 import { CommandPalette } from "@/components/command-palette/CommandPalette";
 import { ToastContainer } from "@/components/shared/Toast";
 import { FocusTimer } from "@/components/shared/FocusTimer";
-import { WifiOff } from "lucide-react";
+import { WifiOff, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function OfflineBanner() {
   const [offline, setOffline] = useState(!navigator.onLine);
+  const [dismissed, setDismissed] = useState(false);
+  const [entering, setEntering] = useState(true);
 
   useEffect(() => {
-    const goOffline = () => setOffline(true);
+    const goOffline = () => { setOffline(true); setDismissed(false); };
     const goOnline = () => setOffline(false);
     window.addEventListener("offline", goOffline);
     window.addEventListener("online", goOnline);
@@ -21,14 +24,37 @@ function OfflineBanner() {
     };
   }, []);
 
-  if (!offline) return null;
+  useEffect(() => {
+    if (offline && !dismissed) {
+      const raf = requestAnimationFrame(() => setEntering(false));
+      return () => cancelAnimationFrame(raf);
+    } else {
+      setEntering(true);
+    }
+  }, [offline, dismissed]);
+
+  if (!offline || dismissed) return null;
 
   return (
-    <div className="shrink-0 flex items-center justify-center gap-2 px-4 py-1.5 bg-amber-500/15 border-b border-amber-500/20 text-amber-700 dark:text-amber-400">
-      <WifiOff className="w-3.5 h-3.5" />
-      <span className="text-[12px] font-medium">
+    <div
+      className={cn(
+        "shrink-0 flex items-center justify-center gap-2.5 px-4 py-2 border-b transition-all duration-300",
+        "bg-amber-500/8 border-amber-500/15",
+        entering ? "opacity-0 -translate-y-1" : "opacity-100 translate-y-0",
+      )}
+    >
+      <div className="w-5 h-5 rounded-full bg-amber-500/15 flex items-center justify-center">
+        <WifiOff className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+      </div>
+      <span className="text-[12px] font-medium text-amber-700 dark:text-amber-300">
         You're offline — publishing, AI, and sync features are unavailable
       </span>
+      <button
+        onClick={() => setDismissed(true)}
+        className="ml-2 w-5 h-5 rounded-md flex items-center justify-center text-amber-600/40 hover:text-amber-600/80 hover:bg-amber-500/10 transition-colors"
+      >
+        <X className="w-3 h-3" />
+      </button>
     </div>
   );
 }

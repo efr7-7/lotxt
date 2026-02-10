@@ -255,24 +255,24 @@ export default function HomeWorkspace() {
   const dayLabels = ["M", "T", "W", "T", "F", "S", "S"];
 
   return (
-    <div className="h-full w-full overflow-y-auto">
+    <div className="h-full w-full overflow-y-auto scroll-fade">
       <div className="max-w-4xl mx-auto px-8 py-8 flex flex-col gap-8">
 
         {/* ─── 1. Greeting Header ─── */}
-        <header className="flex flex-col gap-1.5">
+        <header className="flex flex-col gap-1.5" style={{ animation: "slide-up 0.3s cubic-bezier(0.16,1,0.3,1) both" }}>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-primary/60 mb-1">
+            {dateStr}
+          </p>
           <h1 className="text-[28px] font-bold tracking-tight text-foreground">
             {greeting}
           </h1>
-          <p className="text-[15px] text-muted-foreground">
+          <p className="text-[15px] text-muted-foreground/70">
             Ready to create something great?
-          </p>
-          <p className="text-[13px] text-muted-foreground/60 mt-0.5">
-            {dateStr}
           </p>
         </header>
 
         {/* ─── 2. Write · Grow · Sell Pillars ─── */}
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col gap-3" style={{ animation: "slide-up 0.35s cubic-bezier(0.16,1,0.3,1) 0.05s both" }}>
           <h2 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground/70">
             Write · Grow · Sell
           </h2>
@@ -523,7 +523,7 @@ export default function HomeWorkspace() {
         })()}
 
         {/* ─── 3. Quick Actions ─── */}
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col gap-3" style={{ animation: "slide-up 0.35s cubic-bezier(0.16,1,0.3,1) 0.15s both" }}>
           <h2 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground/70">
             Jump In
           </h2>
@@ -823,17 +823,20 @@ function ActionCard({
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-start gap-3 rounded-xl border border-border bg-card p-5",
-        "shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]",
-        "hover:border-primary/30 hover:scale-[1.02] active:scale-[0.98]",
-        "transition-all duration-150 text-left",
+        "group relative flex flex-col items-start gap-3 rounded-2xl border border-border/60 bg-card p-5",
+        "shadow-[var(--shadow-xs)] hover:shadow-[var(--shadow-md)]",
+        "hover:border-primary/30 active:scale-[0.97]",
+        "transition-all duration-200 text-left overflow-hidden",
       )}
+      style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
     >
-      <div className="w-10 h-10 rounded-xl bg-primary/8 group-hover:bg-primary/12 flex items-center justify-center transition-colors">
-        <Icon className="w-5 h-5 text-primary/70 group-hover:text-primary transition-colors" />
+      {/* Subtle hover gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/3 group-hover:to-primary/8 transition-all duration-300 pointer-events-none" />
+      <div className="relative w-10 h-10 rounded-xl bg-primary/8 group-hover:bg-primary/15 flex items-center justify-center transition-all duration-200 group-hover:shadow-[0_0_12px_hsl(var(--primary)/0.15)]">
+        <Icon className="w-5 h-5 text-primary/70 group-hover:text-primary transition-colors duration-200" />
       </div>
-      <div>
-        <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors">
+      <div className="relative">
+        <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors duration-200">
           {title}
         </p>
         <p className="text-[12px] text-muted-foreground mt-0.5">

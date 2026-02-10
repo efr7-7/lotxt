@@ -2,7 +2,7 @@ use reqwest::Client;
 use serde::Deserialize;
 
 use crate::commands::platform::{
-    AnalyticsData, GrowthPoint, PostPerformance, Publication, PublishRequest, Subscriber,
+    AnalyticsData, ImportedPost, PostPerformance, Publication, PublishRequest, Subscriber,
 };
 use crate::services::PlatformService;
 
@@ -40,7 +40,10 @@ struct BeehiivPost {
     title: Option<String>,
     publish_date: Option<i64>,
     stats: Option<BeehiivPostStats>,
+    #[allow(dead_code)]
     status: Option<String>,
+    content_html: Option<String>,
+    web_url: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -285,5 +288,48 @@ impl PlatformService for BeehiivService {
         let result: BeehiivSingleResponse<BeehiivPost> =
             resp.json().await.map_err(|e| e.to_string())?;
         Ok(result.data.id)
+    }
+}
+
+// ─── Import (standalone, not on trait) ──────────────────────────
+
+impl BeehiivService {
+    pub async fn import_posts(
+        api_key: &str,
+        publication_id: Option<&str>,
+    ) -> Result<Vec<ImportedPost>, String> {
+        let pub_id = publication_id.ok_or("Publication ID required for Beehiiv import")?;
+        let c = client(api_key)?;
+
+        let resp = c
+            .get(format!("{}/publications/{}/posts", BASE_URL, pub_id))
+            .query(&[("status", "confirmed"), ("limit", "50"), ("expand", "free_web_content")])
+            .send()
+            .await
+            .map_err(|e| e.to_string())?;
+
+        if !resp.status().is_success() {
+            return Err(format!("Beehiiv import error: {}", resp.status()));
+        }
+
+        let body: BeehiivListResponse<BeehiivPost> =
+            resp.json().await.map_err(|e| e.to_string())?;
+
+        Ok(body
+            .data
+            .into_iter()
+            .map(|p| ImportedPost {
+                id: p.id,
+                title: p.title.unwrap_or_else(|| "Untitled".to_string()),
+                html_content: p.content_html.unwrap_or_default(),
+                published_at: p.publish_date.map(|t| {
+                    chrono::DateTime::from_timestamp(t, 0)
+                        .map(|dt| dt.format("%Y-%m-%dT%H:%M:%SZ").to_string())
+                        .unwrap_or_default()
+                }),
+                url: p.web_url,
+                platform: "beehiiv".to_string(),
+            })
+            .collect())
     }
 }

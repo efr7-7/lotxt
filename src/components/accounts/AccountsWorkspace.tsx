@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { useAccountsStore } from "@/stores/accounts-store";
 import { AccountCard } from "./AccountCard";
 import { AddAccountDialog } from "./AddAccountDialog";
-import { Plus, Loader2 } from "lucide-react";
+import { AiProviderSettings } from "./AiProviderSettings";
+import { Plus, Loader2, Plug } from "lucide-react";
 import { useState } from "react";
 
 export default function AccountsWorkspace() {
@@ -19,23 +20,23 @@ export default function AccountsWorkspace() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-xl font-semibold text-foreground">Accounts</h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <h1 className="text-lg font-semibold text-foreground/90">Accounts</h1>
+            <p className="text-[13px] text-muted-foreground/50 mt-0.5">
               Manage your newsletter platform connections
             </p>
           </div>
           <button
             onClick={() => setIsAddDialogOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-[13px] font-medium hover:bg-primary/90 transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5" />
             Add Account
           </button>
         </div>
 
         {/* Error */}
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+          <div className="mb-4 p-3 rounded-lg bg-destructive/5 border border-destructive/15 text-[13px] text-destructive/80">
             {error}
           </div>
         )}
@@ -43,25 +44,25 @@ export default function AccountsWorkspace() {
         {/* Loading */}
         {isLoading && accounts.length === 0 && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            <Loader2 className="w-5 h-5 animate-spin text-primary/50" />
           </div>
         )}
 
         {/* Empty state */}
         {!isLoading && accounts.length === 0 && (
-          <div className="text-center py-20 border border-dashed border-border rounded-xl">
-            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-              <Plus className="w-5 h-5 text-muted-foreground" />
+          <div className="text-center py-16 border border-dashed border-border/40 rounded-2xl bg-card/20">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-muted to-muted/50 border border-border/30 flex items-center justify-center mx-auto mb-4">
+              <Plug className="w-6 h-6 text-muted-foreground/40" />
             </div>
-            <h3 className="text-sm font-medium text-foreground mb-1">
+            <h3 className="text-[14px] font-semibold text-foreground/80 mb-1.5">
               No accounts connected
             </h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Connect your Beehiiv, Substack, or Kit account to start publishing
+            <p className="text-[13px] text-muted-foreground/45 mb-5 max-w-[280px] mx-auto leading-relaxed">
+              Connect your Beehiiv, Substack, or Kit account to start publishing directly from Station.
             </p>
             <button
               onClick={() => setIsAddDialogOpen(true)}
-              className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+              className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-[13px] font-medium hover:bg-primary/90 transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]"
             >
               Add Your First Account
             </button>
@@ -69,7 +70,7 @@ export default function AccountsWorkspace() {
         )}
 
         {/* Account cards */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {accounts.map((account) => (
             <AccountCard
               key={`${account.platform}-${account.accountId}`}
@@ -77,6 +78,12 @@ export default function AccountsWorkspace() {
             />
           ))}
         </div>
+
+        {/* Divider */}
+        <div className="h-px bg-border/30 my-8" />
+
+        {/* AI Provider Settings */}
+        <AiProviderSettings />
       </div>
 
       {/* Add account dialog */}

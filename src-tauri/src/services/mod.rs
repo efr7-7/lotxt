@@ -1,6 +1,10 @@
 pub mod beehiiv;
+pub mod ghost;
 pub mod kit;
+pub mod linkedin;
+pub mod stripe;
 pub mod substack;
+pub mod twitter;
 
 use crate::commands::platform::{
     AnalyticsData, Publication, PublishRequest, Subscriber,

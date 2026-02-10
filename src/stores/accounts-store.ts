@@ -93,6 +93,22 @@ export const useAccountsStore = create<AccountsState>((set, get) => ({
           cookie: fields.cookie || null,
         });
       }
+      // For Ghost, build JSON config with api_url + api_key
+      if (platform === "ghost") {
+        apiKey = JSON.stringify({
+          api_url: fields.api_url || "",
+          api_key: fields.api_key || "",
+        });
+      }
+      // For Twitter, build JSON config with all OAuth 1.0a fields
+      if (platform === "twitter") {
+        apiKey = JSON.stringify({
+          api_key: fields.api_key || "",
+          api_secret: fields.api_secret || "",
+          access_token: fields.access_token || "",
+          access_secret: fields.access_secret || "",
+        });
+      }
 
       await invoke("store_credential", {
         platform,

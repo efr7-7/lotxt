@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use tauri::AppHandle;
 use tauri_plugin_store::StoreExt;
 
-use crate::services::{beehiiv, kit, substack, PlatformService};
+use crate::services::{beehiiv, ghost, kit, linkedin, substack, twitter, PlatformService};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Publication {
@@ -58,6 +58,16 @@ pub struct PublishRequest {
     pub status: String, // "draft" or "published"
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ImportedPost {
+    pub id: String,
+    pub title: String,
+    pub html_content: String,
+    pub published_at: Option<String>,
+    pub url: Option<String>,
+    pub platform: String,
+}
+
 fn get_api_key(app: &AppHandle, platform: &str, account_id: &str) -> Result<String, String> {
     let store = app.store("credentials.json").map_err(|e| e.to_string())?;
     let key = format!("{}:{}", platform, account_id);
@@ -82,6 +92,9 @@ pub async fn connect_platform(
         "beehiiv" => beehiiv::BeehiivService::validate_connection(&api_key).await,
         "substack" => substack::SubstackService::validate_connection(&api_key).await,
         "kit" => kit::KitService::validate_connection(&api_key).await,
+        "ghost" => ghost::GhostService::validate_connection(&api_key).await,
+        "twitter" => twitter::TwitterService::validate(&api_key).await,
+        "linkedin" => linkedin::LinkedinService::validate(&api_key).await,
         _ => Err(format!("Unknown platform: {}", platform)),
     }
 }
@@ -94,7 +107,7 @@ pub async fn disconnect_platform(
 ) -> Result<(), String> {
     let store = app.store("credentials.json").map_err(|e| e.to_string())?;
     let key = format!("{}:{}", platform, account_id);
-    store.delete(&key).map_err(|e| e.to_string())?;
+    store.delete(&key);
     store.save().map_err(|e| e.to_string())?;
     Ok(())
 }
@@ -110,6 +123,7 @@ pub async fn get_publications(
         "beehiiv" => beehiiv::BeehiivService::get_publications(&api_key).await,
         "substack" => substack::SubstackService::get_publications(&api_key).await,
         "kit" => kit::KitService::get_publications(&api_key).await,
+        "ghost" => ghost::GhostService::get_publications(&api_key).await,
         _ => Err(format!("Unknown platform: {}", platform)),
     }
 }
@@ -130,6 +144,9 @@ pub async fn get_subscribers(
             substack::SubstackService::get_subscribers(&api_key, publication_id.as_deref()).await
         }
         "kit" => kit::KitService::get_subscribers(&api_key, publication_id.as_deref()).await,
+        "ghost" => {
+            ghost::GhostService::get_subscribers(&api_key, publication_id.as_deref()).await
+        }
         _ => Err(format!("Unknown platform: {}", platform)),
     }
 }
@@ -150,6 +167,9 @@ pub async fn get_analytics(
             substack::SubstackService::get_analytics(&api_key, publication_id.as_deref()).await
         }
         "kit" => kit::KitService::get_analytics(&api_key, publication_id.as_deref()).await,
+        "ghost" => {
+            ghost::GhostService::get_analytics(&api_key, publication_id.as_deref()).await
+        }
         _ => Err(format!("Unknown platform: {}", platform)),
     }
 }
@@ -171,6 +191,63 @@ pub async fn publish_post(
             substack::SubstackService::publish(&api_key, &publication_id, request).await
         }
         "kit" => kit::KitService::publish(&api_key, &publication_id, request).await,
+        "ghost" => {
+            ghost::GhostService::publish(&api_key, &publication_id, request).await
+        }
         _ => Err(format!("Unknown platform: {}", platform)),
     }
+}
+
+// ─── Import from Platforms ──────────────────────────────────────
+
+#[tauri::command]
+pub async fn import_posts(
+    app: AppHandle,
+    platform: String,
+    account_id: String,
+    publication_id: Option<String>,
+) -> Result<Vec<ImportedPost>, String> {
+    let api_key = get_api_key(&app, &platform, &account_id)?;
+    match platform.as_str() {
+        "beehiiv" => {
+            beehiiv::BeehiivService::import_posts(&api_key, publication_id.as_deref()).await
+        }
+        "kit" => kit::KitService::import_posts(&api_key).await,
+        "ghost" => ghost::GhostService::import_posts(&api_key).await,
+        "substack" => substack::SubstackService::import_posts(&api_key).await,
+        _ => Err(format!("Import not supported for platform: {}", platform)),
+    }
+}
+
+// ─── Social Platform Posting ────────────────────────────────────
+
+#[tauri::command]
+pub async fn post_tweet(
+    app: AppHandle,
+    account_id: String,
+    content: String,
+) -> Result<String, String> {
+    let api_key = get_api_key(&app, "twitter", &account_id)?;
+    twitter::TwitterService::post_tweet(&api_key, &content).await
+}
+
+#[tauri::command]
+pub async fn post_thread(
+    app: AppHandle,
+    account_id: String,
+    tweets: Vec<String>,
+) -> Result<Vec<String>, String> {
+    let api_key = get_api_key(&app, "twitter", &account_id)?;
+    twitter::TwitterService::post_thread(&api_key, tweets).await
+}
+
+#[tauri::command]
+pub async fn post_linkedin(
+    app: AppHandle,
+    account_id: String,
+    content: String,
+    article_url: Option<String>,
+) -> Result<String, String> {
+    let api_key = get_api_key(&app, "linkedin", &account_id)?;
+    linkedin::LinkedinService::post(&api_key, &content, article_url.as_deref()).await
 }

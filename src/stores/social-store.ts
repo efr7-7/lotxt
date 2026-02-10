@@ -3,7 +3,7 @@ import type { OGMeta } from "@/types/social";
 
 interface SocialState {
   ogMeta: OGMeta;
-  activePlatform: "twitter" | "linkedin" | "facebook" | "email" | "all";
+  activePlatform: "twitter" | "linkedin" | "facebook" | "email" | "youtube" | "tiktok" | "all";
   setOGMeta: (meta: Partial<OGMeta>) => void;
   setActivePlatform: (p: SocialState["activePlatform"]) => void;
   deriveFromEditor: (title: string, htmlContent: string) => void;

@@ -63,7 +63,7 @@ pub async fn delete_credential(
 ) -> Result<(), String> {
     let store = app.store("credentials.json").map_err(|e| e.to_string())?;
     let key = format!("{}:{}", platform, account_id);
-    store.delete(&key).map_err(|e| e.to_string())?;
+    store.delete(&key);
     store.save().map_err(|e| e.to_string())?;
     Ok(())
 }

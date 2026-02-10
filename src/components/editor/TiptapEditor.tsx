@@ -1,32 +1,23 @@
-import { useEditor, EditorContent } from "@tiptap/react";
-import { useEffect, useCallback } from "react";
-import { getEditorExtensions } from "@/lib/editor-extensions";
+import { EditorContent } from "@tiptap/react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { useEditorStore } from "@/stores/editor-store";
+import { useEditorInstance } from "./EditorContext";
 import { SlashCommandMenu } from "./SlashCommandMenu";
 
-export function TiptapEditor() {
-  const { currentDocument, setContent, setWordCount } = useEditorStore();
-
-  const editor = useEditor({
-    extensions: getEditorExtensions(),
-    content: currentDocument.content || "<p></p>",
-    editorProps: {
-      attributes: {
-        class: "tiptap-editor outline-none min-h-[60vh]",
-      },
-    },
-    onUpdate: ({ editor }) => {
-      const json = editor.getJSON();
-      const html = editor.getHTML();
-      setContent(json, html);
-
-      // Word/char count
-      const text = editor.state.doc.textContent;
-      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-      const chars = text.length;
-      setWordCount(words, chars);
-    },
+function readFileAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
+}
+
+export function TiptapEditor() {
+  const { currentDocument } = useEditorStore();
+  const editor = useEditorInstance();
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounter = useRef(0);
 
   // Sync document content when switching documents
   useEffect(() => {
@@ -93,8 +84,98 @@ export function TiptapEditor() {
     [editor],
   );
 
+  const handleDrop = useCallback(
+    async (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setIsDragging(false);
+      dragCounter.current = 0;
+
+      if (!editor) return;
+
+      const { files } = e.dataTransfer;
+
+      // Handle image file drops
+      if (files && files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          if (file.type.startsWith("image/")) {
+            const dataUrl = await readFileAsDataURL(file);
+            editor.chain().focus().setImage({ src: dataUrl }).run();
+          }
+        }
+        return;
+      }
+
+      // Handle HTML content drops (e.g., dragging images between apps)
+      const html = e.dataTransfer.getData("text/html");
+      if (html) {
+        editor.chain().focus().insertContent(html).run();
+        return;
+      }
+
+      // Handle plain text drops
+      const text = e.dataTransfer.getData("text/plain");
+      if (text) {
+        editor.chain().focus().insertContent(text).run();
+      }
+    },
+    [editor],
+  );
+
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+  }, []);
+
+  const handleDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    dragCounter.current += 1;
+    if (e.dataTransfer.types.includes("Files")) {
+      setIsDragging(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    dragCounter.current -= 1;
+    if (dragCounter.current <= 0) {
+      dragCounter.current = 0;
+      setIsDragging(false);
+    }
+  }, []);
+
+  const handlePaste = useCallback(
+    async (e: React.ClipboardEvent<HTMLDivElement>) => {
+      if (!editor) return;
+
+      const { items } = e.clipboardData;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type.startsWith("image/")) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) {
+            const dataUrl = await readFileAsDataURL(file);
+            editor.chain().focus().setImage({ src: dataUrl }).run();
+          }
+          return;
+        }
+      }
+    },
+    [editor],
+  );
+
   return (
-    <div className="relative">
+    <div
+      className={`relative ${isDragging ? "editor-drop-active" : ""}`}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onPaste={handlePaste}
+    >
       <EditorContent editor={editor} />
       {editor && (
         <SlashCommandMenu editor={editor} onCommand={handleSlashCommand} />

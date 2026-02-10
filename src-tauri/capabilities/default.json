@@ -5,7 +5,24 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-close",
+    "core:window:allow-start-dragging",
+    "core:window:allow-set-focus",
+    "core:window:allow-is-maximized",
+    "core:window:allow-maximize",
+    "core:window:allow-unmaximize",
     "opener:default",
-    "store:default"
+    "store:default",
+    "dialog:default",
+    "fs:default",
+    "fs:allow-app-write",
+    "fs:allow-app-read",
+    "fs:allow-appdata-write",
+    "fs:allow-appdata-read",
+    "fs:allow-applog-write",
+    "fs:allow-applog-read",
+    "core:event:default"
   ]
 }

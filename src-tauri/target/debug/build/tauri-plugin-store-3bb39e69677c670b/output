@@ -1,7 +1,0 @@
-cargo:rerun-if-changed=permissions
-cargo:PERMISSION_FILES_PATH=C:\Users\elyss\Downloads\station\src-tauri\target\debug\build\tauri-plugin-store-3bb39e69677c670b\out\tauri-plugin-store-permission-files
-cargo:rerun-if-env-changed=REMOVE_UNUSED_COMMANDS
-cargo:GLOBAL_API_SCRIPT_PATH=\\?\C:\Users\elyss\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tauri-plugin-store-2.4.2\api-iife.js
-cargo:rustc-check-cfg=cfg(mobile)
-cargo:rustc-check-cfg=cfg(desktop)
-cargo:rustc-cfg=desktop

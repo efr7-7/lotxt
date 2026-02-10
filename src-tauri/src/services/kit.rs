@@ -2,7 +2,7 @@ use reqwest::Client;
 use serde::Deserialize;
 
 use crate::commands::platform::{
-    AnalyticsData, GrowthPoint, PostPerformance, Publication, PublishRequest, Subscriber,
+    AnalyticsData, ImportedPost, PostPerformance, Publication, PublishRequest, Subscriber,
 };
 use crate::services::PlatformService;
 
@@ -13,6 +13,7 @@ pub struct KitService;
 // ─── Kit (ConvertKit) API v4 response types ─────────────────────
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 struct KitPaginatedResponse<T> {
     data: Option<Vec<T>>,
     subscribers: Option<Vec<T>>,
@@ -37,12 +38,14 @@ struct KitSubscriber {
 struct KitBroadcast {
     id: u64,
     subject: Option<String>,
+    content: Option<String>,
     created_at: Option<String>,
     stats: Option<KitBroadcastStats>,
 }
 
 #[derive(Deserialize)]
 struct KitBroadcastStats {
+    #[allow(dead_code)]
     recipients: Option<u64>,
     open_rate: Option<f64>,
     click_rate: Option<f64>,
@@ -263,5 +266,44 @@ impl PlatformService for KitService {
             .unwrap_or_else(|| "unknown".to_string());
 
         Ok(id)
+    }
+}
+
+// ─── Import (standalone, not on trait) ──────────────────────────
+
+impl KitService {
+    pub async fn import_posts(api_key: &str) -> Result<Vec<ImportedPost>, String> {
+        let c = client(api_key)?;
+
+        let resp = c
+            .get(format!("{}/broadcasts", BASE_URL))
+            .query(&[("per_page", "50")])
+            .send()
+            .await
+            .map_err(|e| e.to_string())?;
+
+        if !resp.status().is_success() {
+            return Err(format!("Kit import error: {}", resp.status()));
+        }
+
+        let body: serde_json::Value = resp.json().await.map_err(|e| e.to_string())?;
+        let broadcasts: Vec<KitBroadcast> = serde_json::from_value(
+            body.get("broadcasts")
+                .cloned()
+                .unwrap_or(serde_json::Value::Array(vec![])),
+        )
+        .unwrap_or_default();
+
+        Ok(broadcasts
+            .into_iter()
+            .map(|b| ImportedPost {
+                id: b.id.to_string(),
+                title: b.subject.unwrap_or_else(|| "Untitled".to_string()),
+                html_content: b.content.unwrap_or_default(),
+                published_at: b.created_at,
+                url: None,
+                platform: "kit".to_string(),
+            })
+            .collect())
     }
 }

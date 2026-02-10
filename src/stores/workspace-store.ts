@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type WorkspaceId = "editor" | "canvas" | "analytics" | "accounts" | "social-preview";
+export type WorkspaceId = "home" | "editor" | "canvas" | "analytics" | "accounts" | "distribute" | "calendar";
 
 interface WorkspaceState {
   activeWorkspace: WorkspaceId;
@@ -9,7 +9,7 @@ interface WorkspaceState {
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
-  activeWorkspace: "editor",
+  activeWorkspace: "home",
   previousWorkspace: null,
   setActiveWorkspace: (id) =>
     set({

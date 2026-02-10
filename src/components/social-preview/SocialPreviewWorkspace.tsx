@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useSocialStore } from "@/stores/social-store";
 import { useEditorStore } from "@/stores/editor-store";
 import { OGMetaEditor } from "./OGMetaEditor";
@@ -6,7 +7,7 @@ import { LinkedInPreview } from "./LinkedInPreview";
 import { FacebookPreview } from "./FacebookPreview";
 import { EmailPreview } from "./EmailPreview";
 import { cn } from "@/lib/utils";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Zap } from "lucide-react";
 
 const PLATFORMS = [
   { id: "all" as const, label: "All" },
@@ -20,28 +21,42 @@ export default function SocialPreviewWorkspace() {
   const { ogMeta, activePlatform, setActivePlatform, deriveFromEditor } = useSocialStore();
   const { currentDocument } = useEditorStore();
 
-  const handleSync = () => {
+  // Auto-sync from editor on mount and when switching to this workspace
+  useEffect(() => {
+    if (currentDocument.title || currentDocument.htmlContent) {
+      deriveFromEditor(currentDocument.title, currentDocument.htmlContent);
+    }
+  }, []); // Only on mount — live sync happens via EditorContext debounce
+
+  const handleManualSync = () => {
     deriveFromEditor(currentDocument.title, currentDocument.htmlContent);
   };
 
   const showPlatform = (p: typeof activePlatform) =>
     activePlatform === "all" || activePlatform === p;
 
+  const hasContent = ogMeta.title || currentDocument.title;
+
   return (
     <div className="h-full flex">
       {/* Left: OG Meta Editor */}
-      <div className="w-72 border-r border-border bg-card/50 shrink-0 overflow-y-auto">
+      <div className="w-[280px] border-r border-border/40 bg-background shrink-0 overflow-y-auto">
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-foreground">Meta Tags</h2>
-            <button
-              onClick={handleSync}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              title="Sync from editor"
-            >
-              <RefreshCw className="w-3 h-3" />
-              Sync
-            </button>
+            <h2 className="text-[13px] font-semibold text-foreground">Meta Tags</h2>
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1 text-[10px] text-primary/60">
+                <Zap className="w-2.5 h-2.5" />
+                Auto-sync
+              </span>
+              <button
+                onClick={handleManualSync}
+                className="flex items-center gap-1 text-[11px] text-muted-foreground/50 hover:text-foreground transition-colors"
+                title="Force sync from editor"
+              >
+                <RefreshCw className="w-3 h-3" />
+              </button>
+            </div>
           </div>
           <OGMetaEditor />
         </div>
@@ -50,16 +65,16 @@ export default function SocialPreviewWorkspace() {
       {/* Right: Previews */}
       <div className="flex-1 overflow-y-auto">
         {/* Platform filter tabs */}
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border px-6 py-2 flex items-center gap-1">
+        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border/40 px-6 py-2 flex items-center gap-1">
           {PLATFORMS.map((p) => (
             <button
               key={p.id}
               onClick={() => setActivePlatform(p.id)}
               className={cn(
-                "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                "px-3 py-1.5 rounded-md text-[12px] font-medium transition-colors",
                 activePlatform === p.id
-                  ? "bg-primary/15 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground/60 hover:text-foreground hover:bg-accent/50",
               )}
             >
               {p.label}
@@ -69,10 +84,17 @@ export default function SocialPreviewWorkspace() {
 
         {/* Preview cards */}
         <div className="p-6 space-y-6">
-          {!ogMeta.title && !currentDocument.title ? (
+          {!hasContent ? (
             <div className="text-center py-20">
-              <p className="text-muted-foreground text-sm">
-                Write something in the editor, then click "Sync" to preview how it'll look on social platforms.
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-6 h-6 text-primary/40" />
+              </div>
+              <p className="text-[14px] font-semibold text-foreground/70 mb-1.5">
+                Live social previews
+              </p>
+              <p className="text-[13px] text-muted-foreground/40 leading-relaxed max-w-[280px] mx-auto">
+                Start writing in the editor — previews for
+                Twitter, LinkedIn, Facebook, and email will update automatically.
               </p>
             </div>
           ) : (

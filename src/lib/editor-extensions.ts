@@ -12,6 +12,10 @@ import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
+import Dropcursor from "@tiptap/extension-dropcursor";
+import Gapcursor from "@tiptap/extension-gapcursor";
+import Superscript from "@tiptap/extension-superscript";
+import Subscript from "@tiptap/extension-subscript";
 
 export function getEditorExtensions() {
   return [
@@ -42,6 +46,8 @@ export function getEditorExtensions() {
       HTMLAttributes: {
         class: "max-w-full h-auto rounded-lg",
       },
+      allowBase64: true,
+      inline: false,
     }),
     Placeholder.configure({
       placeholder: ({ node }) => {
@@ -63,5 +69,12 @@ export function getEditorExtensions() {
     TableRow,
     TableCell,
     TableHeader,
+    Dropcursor.configure({
+      color: "hsl(252 56% 62%)",
+      width: 2,
+    }),
+    Gapcursor,
+    Superscript,
+    Subscript,
   ];
 }

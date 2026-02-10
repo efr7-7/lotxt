@@ -1,7 +1,7 @@
 use reqwest::Client;
 
 use crate::commands::platform::{
-    AnalyticsData, GrowthPoint, PostPerformance, Publication, PublishRequest, Subscriber,
+    AnalyticsData, ImportedPost, PostPerformance, Publication, PublishRequest, Subscriber,
 };
 use crate::services::PlatformService;
 
@@ -35,6 +35,8 @@ struct SubstackPost {
     title: String,
     post_date: Option<String>,
     audience_stats: Option<SubstackAudienceStats>,
+    body_html: Option<String>,
+    canonical_url: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -61,8 +63,8 @@ fn client_with_cookie(cookie: Option<&str>) -> Result<Client, String> {
 impl PlatformService for SubstackService {
     async fn validate_connection(api_key: &str) -> Result<bool, String> {
         let config = parse_config(api_key)?;
-        let c = Client::new();
-        let resp = c
+        let client = Client::new();
+        let resp = client
             .get(format!(
                 "https://{}.substack.com/api/v1/archive?limit=1",
                 config.subdomain
@@ -77,7 +79,6 @@ impl PlatformService for SubstackService {
         let config = parse_config(api_key)?;
 
         // Substack public profile endpoint
-        let c = Client::new();
         let url = format!("https://{}.substack.com", config.subdomain);
 
         Ok(vec![Publication {
@@ -259,5 +260,41 @@ impl PlatformService for SubstackService {
             .unwrap_or_else(|| "draft-created".to_string());
 
         Ok(id)
+    }
+}
+
+// ─── Import (standalone, not on trait) ──────────────────────────
+
+impl SubstackService {
+    pub async fn import_posts(api_key: &str) -> Result<Vec<ImportedPost>, String> {
+        let config = parse_config(api_key)?;
+        let c = Client::new();
+
+        let resp = c
+            .get(format!(
+                "https://{}.substack.com/api/v1/archive?sort=new&limit=50",
+                config.subdomain
+            ))
+            .send()
+            .await
+            .map_err(|e| e.to_string())?;
+
+        if !resp.status().is_success() {
+            return Err(format!("Substack import error: {}", resp.status()));
+        }
+
+        let posts: Vec<SubstackPost> = resp.json().await.unwrap_or_default();
+
+        Ok(posts
+            .into_iter()
+            .map(|p| ImportedPost {
+                id: p.id.to_string(),
+                title: p.title,
+                html_content: p.body_html.unwrap_or_default(),
+                published_at: p.post_date,
+                url: p.canonical_url,
+                platform: "substack".to_string(),
+            })
+            .collect())
     }
 }
